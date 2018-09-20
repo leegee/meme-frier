@@ -13,8 +13,7 @@ module.exports = {
     devtool: "inline-source-map",
     entry: "./src/main.ts",
     output: {
-        path: path.resolve(__dirname, "public"),
-        publicPath: "/build/",
+        path: path.resolve(__dirname, "public/build/"),
         filename: "bundle.js"
     },
     resolve: {
