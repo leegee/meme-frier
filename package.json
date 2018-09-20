@@ -4,7 +4,6 @@
   "description": "Deep fry a meme",
   "main": "src/main.js",
   "dependencies": {
-    "log4js": "^3.0.5"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
