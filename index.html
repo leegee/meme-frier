@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Img Fry</title>
+  <script src="assets/bundle.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Archivo+Black&amp;subset=latin-ext" rel="stylesheet">
+
+  <style>
+    * {
+      font-family: 'Archivo Black';
+    }
+    img {
+      width: 46%;
+      margin-right: 1%;
+      margin-bottom: 1%;
+      float: left;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Toy Example To Deep Fry Images</h1>
+  <p>
+    <img src="img/pokecrod.jpg" class="fry-this" 
+      data-scale=1 
+      data-jpeg-quality=0.9 
+      data-total-jpegs=22 
+      data-use-overlay=true
+      data-noise=0.2
+      data-brightness=2
+      data-saturate=2
+      data-contrast=2
+    >
+    <img src="img/pokecrod.jpg">
+  </p>
+  <p>
+    <img src="img/image.webp" class="fry-this">
+    <img src="img/image.webp">
+  </p>
+  <p>
+    <img src="img/rainbow.jpg" class="fry-this">
+    <img src="img/rainbow.jpg">
+  </p>
+</body>
+
+</html>
