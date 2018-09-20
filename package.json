@@ -24,6 +24,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
     "tsc": "tsc",
     "tsc:w": "tsc -w"
   },
