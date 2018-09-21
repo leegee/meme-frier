@@ -1,5 +1,5 @@
-import { MyApp } from './app';
-import {FriedMeme } from './FriedMeme';
+import { MemeFrier } from './Frier';
+import { FriedMeme } from './FriedMeme';
 
-customElements.define('my-app', MyApp);
+customElements.define('my-app', MemeFrier);
 customElements.define('fried-meme', FriedMeme);
