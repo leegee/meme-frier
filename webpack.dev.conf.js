@@ -12,7 +12,7 @@ module.exports = {
         './src/index'
     ]
   },
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
     hot: true
