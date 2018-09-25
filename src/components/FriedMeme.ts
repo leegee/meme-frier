@@ -45,8 +45,8 @@ export class FriedMeme extends PolymerElement {
 
     static get properties() {
         return {
-            saturate: { type: Number, reflectToAttribute: true, notify: true }, // 1 is default
-            contrast: { type: Number, reflectToAttribute: true, notify: true }, // 1 is default
+            saturate: { type: Number, reflectToAttribute: true  }, // 1 is default
+            contrast: { type: Number, reflectToAttribute: true  }, // 1 is default
             numberOfDips: { type: Number },
             totalJpegs: { type: Number },
             jpegQuality: { type: Number }, // 0 - 1

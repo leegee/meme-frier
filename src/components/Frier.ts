@@ -40,23 +40,9 @@ export class MemeFrier extends PolymerElement {
         <style>
         :host { 
             display: block;
-            background: grey;
-            padding: 1em;
-            text-align: center;
-            color: white;
-            font-family: sans-serif;
-        }
-        :host img {
-            padding: 0;
-            margin: 0;
-            text-align: center;
-            display: block;
-            clear: both;
         }
         </style>
         
-        <h1>Meme Frier</h1>
-
         <fried-meme
             saturate={{saturation}}
             contrast={{contrast}}
@@ -87,6 +73,27 @@ export class MemeFrier extends PolymerElement {
             on-change="changeHandler" 
             value={{brightness}}
             min=0 max=10 step=0.5 
+        ></ranged-input>
+
+        <ranged-input class='vertical'
+            label="Quality" 
+            on-change="changeHandler" 
+            value={{jpegQuality}}
+            min=0 max=1 step=0.05 
+        ></ranged-input>
+
+        <ranged-input class='vertical'
+            label="Noise" 
+            on-change="changeHandler" 
+            value={{noise}}
+            min=0 max=1 step=0.01
+        ></ranged-input>
+
+        <ranged-input class='vertical'
+            label="Iterations" 
+            on-change="changeHandler" 
+            value={{totalJpegs}}
+            min=1 max=50 step=1
         ></ranged-input>
         `;
     }
