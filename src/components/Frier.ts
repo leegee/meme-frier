@@ -1,5 +1,5 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
-import { RangedInput } from '../RangedInput';
+import { RangedInput } from './RangedInput';
 
 export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;

@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2DExtended } from '../../lib/CanvasRenderingContext2DExtended.interface';
+import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 
 export class FriedMeme extends PolymerElement {
