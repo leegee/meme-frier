@@ -3,8 +3,6 @@ import { RangedInput } from './RangedInput';
 
 export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;
-
-    private _lastCallTime: number = 0;
     private _lastCallEvent: number | null = null;
 
     saturation: number | string = 2;
@@ -18,6 +16,10 @@ export class MemeFrier extends PolymerElement {
 
     constructor() {
         super();
+        setTimeout(() => {
+            this.saturation = 0;
+            this.contrast = 0;
+        }, 2000);
     }
 
     static get properties() {
@@ -35,7 +37,27 @@ export class MemeFrier extends PolymerElement {
 
     static get template() {
         return html`
-        <fried-meme 
+        <style>
+        :host { 
+            display: block;
+            background: grey;
+            padding: 1em;
+            text-align: center;
+            color: white;
+            font-family: sans-serif;
+        }
+        :host img {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            display: block;
+            clear: both;
+        }
+        </style>
+        
+        <h1>Meme Frier</h1>
+
+        <fried-meme
             saturate={{saturation}}
             contrast={{contrast}}
             brightness={{brightness}}
@@ -46,21 +68,25 @@ export class MemeFrier extends PolymerElement {
             noise={{noise}}
         ></fried-meme>
 
-        <ranged-input vertical  
-            id="saturate"  
+        <ranged-input class='vertical'
             label="Saturation" 
             on-change="changeHandler"
             value={{saturation}}
-            min=0 max=4 
-            step=0.1 
+            min=0 max=4 step=0.1 
         ></ranged-input>
-        <ranged-input vertical=true
-            id="contrast" 
+
+        <ranged-input class='vertical'
             label="Contrast" 
             on-change="changeHandler" 
             value={{contrast}}
-            min=0 max=10 
-            step=0.5 
+            min=0 max=10 step=0.5 
+        ></ranged-input>
+
+        <ranged-input class='vertical'
+            label="Brightness" 
+            on-change="changeHandler" 
+            value={{brightness}}
+            min=0 max=10 step=0.5 
         ></ranged-input>
         `;
     }
@@ -74,7 +100,7 @@ export class MemeFrier extends PolymerElement {
     }
 
     private _update() {
-        console.log('Update the meme!', this.saturation, this.contrast);
+        console.log('GUI._update says Update the meme!', this.saturation, this.contrast);
     }
 }
 
