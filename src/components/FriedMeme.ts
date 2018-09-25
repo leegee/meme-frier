@@ -74,15 +74,24 @@ export class FriedMeme extends PolymerElement {
 
     static get observers() {
         return [
-            '_process('
+            '_propertiesUpdated('
             + Object.keys(FriedMeme.properties).join(',')
             + ')'
         ]
     }
 
+    _propertiesUpdated() {
+        console.log('Enter _propertiesUpdated');
+        if (this.originalImg){
+            console.log('Set srcimg to ', this.originalImg.src);
+            (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
+            this.connectedCallback();
+    }
+    }
+
     connectedCallback() {
         super.connectedCallback();
-        (<HTMLImageElement>this.$.srcimg).onload = () => {
+        (this.$.srcimg as HTMLImageElement).onload = () => {
             this._loaded = true;
             this._process();
         };
