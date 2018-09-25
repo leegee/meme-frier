@@ -37,6 +37,7 @@ export class RangedInput extends PolymerElement {
                 display: inline-block;
             }
         </style>
+
         <label> 
             {{label}}
             <input on-input="inputHandler" type="range" value="{{value::input}}" min="[[min]]" max="[[max]]" step="[[step]]">

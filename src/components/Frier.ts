@@ -5,21 +5,17 @@ export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;
     private _lastCallEvent: number | null = null;
 
-    saturation: number | string = 2;
-    contrast: number | string = 4;
-    brightness: number | string = 2;
-    scale: number | string = 1;
-    jpegQuality: number | string = 0.9;
-    totalJpegs: number | string = 22;
-    useOverlay: boolean | string = true;
-    noise: number | string = 0.2;
+    saturation: number = 2;
+    contrast: number = 4;
+    brightness: number = 2;
+    scale: number = 1;
+    jpegQuality: number = 0.9;
+    totalJpegs: number = 22;
+    useOverlay: boolean = true;
+    noise: number = 0.2;
 
     constructor() {
         super();
-        setTimeout(() => {
-            this.saturation = 0;
-            this.contrast = 0;
-        }, 2000);
     }
 
     static get properties() {
@@ -56,58 +52,40 @@ export class MemeFrier extends PolymerElement {
 
         <ranged-input class='vertical'
             label="Saturation" 
-            on-change="changeHandler"
             value={{saturation}}
             min=0 max=4 step=0.1 
         ></ranged-input>
 
         <ranged-input class='vertical'
             label="Contrast" 
-            on-change="changeHandler" 
             value={{contrast}}
             min=0 max=10 step=0.5 
         ></ranged-input>
 
         <ranged-input class='vertical'
             label="Brightness" 
-            on-change="changeHandler" 
             value={{brightness}}
             min=0 max=10 step=0.5 
         ></ranged-input>
 
         <ranged-input class='vertical'
             label="Quality" 
-            on-change="changeHandler" 
             value={{jpegQuality}}
             min=0 max=1 step=0.05 
         ></ranged-input>
 
         <ranged-input class='vertical'
             label="Noise" 
-            on-change="changeHandler" 
             value={{noise}}
             min=0 max=1 step=0.01
         ></ranged-input>
 
         <ranged-input class='vertical'
             label="Iterations" 
-            on-change="changeHandler" 
             value={{totalJpegs}}
             min=1 max=50 step=1
         ></ranged-input>
         `;
-    }
-
-    changeHandler(e) {
-        // Debounce, delay before action
-        if (this._lastCallEvent) {
-            clearTimeout(this._lastCallEvent);
-        }
-        this._lastCallEvent = setTimeout(() => { this._update() }, MemeFrier.DebounceMs);
-    }
-
-    private _update() {
-        console.log('GUI._update says Update the meme!', this.saturation, this.contrast);
     }
 }
 
