@@ -4,18 +4,32 @@ import { RangedInput } from './RangedInput';
 export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;
 
+    private _lastCallTime: number = 0;
+    private _lastCallEvent: number | null = null;
+
     saturation: number | string = 2;
     contrast: number | string = 4;
-    _lastCallTime: number = 0;
-    _lastCallEvent: number | null = null;
+    brightness: number | string = 2;
+    scale: number | string = 1;
+    jpegQuality: number | string = 0.9;
+    totalJpegs: number | string = 22;
+    useOverlay: boolean | string = true;
+    noise: number | string = 0.2;
 
     constructor() {
         super();
     }
+
     static get properties() {
         return {
             saturation: { type: Number, reflectToAttribute: true, notify: true },
             contrast: { type: Number, reflectToAttribute: true, notify: true },
+            brightness: { type: Number, reflectToAttribute: true, notify: true },
+            scale: { type: Number, reflectToAttribute: true, notify: true },
+            jpegQuality: { type: Number, reflectToAttribute: true, notify: true },
+            totalJpegs: { type: Number, reflectToAttribute: true, notify: true },
+            useOverlay: { type: Number, reflectToAttribute: true, notify: true },
+            noise: { type: Number, reflectToAttribute: true, notify: true }
         }
     }
 
@@ -24,7 +38,14 @@ export class MemeFrier extends PolymerElement {
         <fried-meme 
             saturate={{saturation}}
             contrast={{contrast}}
+            brightness={{brightness}}
+            scale={{scale}}
+            jpeg-quality={{jpegQuality}}
+            total-jpegs={{totalJpegs}}
+            use-overlay={{useOverlay}}
+            noise={{noise}}
         ></fried-meme>
+
         <ranged-input vertical  
             id="saturate"  
             label="Saturation" 
@@ -45,14 +66,11 @@ export class MemeFrier extends PolymerElement {
     }
 
     changeHandler(e) {
-        // Make sure there is a delay in action after this call
-        const now = new Date().getTime();
-        // If there has NOT been a delay since the last call, clear last call and
-        if (now < this._lastCallTime + MemeFrier.DebounceMs && this._lastCallEvent) {
-            clearTimeout( this._lastCallEvent );
+        // Debounce, delay before action
+        if (this._lastCallEvent) {
+            clearTimeout(this._lastCallEvent);
         }
-        // call to update meme in a while (unless we get recalled with that while)
-        this._lastCallEvent = setTimeout( () => { this._update() }, MemeFrier.DebounceMs );
+        this._lastCallEvent = setTimeout(() => { this._update() }, MemeFrier.DebounceMs);
     }
 
     private _update() {
