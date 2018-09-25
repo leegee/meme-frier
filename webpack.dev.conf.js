@@ -23,12 +23,14 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.html$/,
-        use: {
-          loader: 'html-loader'
-        }
-      },
+      // {
+      //   test: /\.html$/,
+      //   use:  'html-loader'
+      // },
+      // {
+      //   test: /\.txt$/,
+      //   use: 'raw-loader'
+      // },
       {
         test: /\.ts?$/,
         use: 'ts-loader',
@@ -37,7 +39,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: [
+      '.ts', '.js'
+      // , '.html', '.txt'
+    ]
   },
   plugins: [
     new CleanWebpackPlugin(['dist'], { verbose: true, root: path.resolve(__dirname) }),

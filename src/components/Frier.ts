@@ -1,5 +1,4 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
-import { RangedInput } from './RangedInput';
 
 export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;
@@ -13,6 +12,7 @@ export class MemeFrier extends PolymerElement {
     totalJpegs: number = 22;
     useOverlay: boolean = true;
     noise: number = 0.2;
+    src!: string;
 
     constructor() {
         super();
@@ -27,7 +27,8 @@ export class MemeFrier extends PolymerElement {
             jpegQuality: { type: Number, reflectToAttribute: true, notify: true },
             totalJpegs: { type: Number, reflectToAttribute: true, notify: true },
             useOverlay: { type: Number, reflectToAttribute: true, notify: true },
-            noise: { type: Number, reflectToAttribute: true, notify: true }
+            noise: { type: Number, reflectToAttribute: true, notify: true },
+            src: { type: String, reflectToAttribute: true, notify: true }
         }
     }
 
@@ -40,6 +41,7 @@ export class MemeFrier extends PolymerElement {
         </style>
         
         <fried-meme
+            src=[[src]]
             saturate={{saturation}}
             contrast={{contrast}}
             brightness={{brightness}}
