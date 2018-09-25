@@ -1,8 +1,17 @@
-import { CanvasRenderingContext2DExtended } from './CanvasRenderingContext2DExtended.interface';
+import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+// import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
-export class FriedMeme {
+export class FriedMeme extends PolymerElement {
     public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
 
+    static DebounceMs = 250;
+
+    private _loaded = false;
+    private _running = false;
+
+    private img!: HTMLImageElement;
+    // private src!: string;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
     private originalImg!: HTMLImageElement;
@@ -10,43 +19,112 @@ export class FriedMeme {
     private height!: number;
     private jpegItteration!: number;
 
-    constructor(
-        private document: Document,
-        private img: HTMLImageElement,
-        private numberOfDips = 1,
-        private totalJpegs = 28,
-        private jpegQuality = 0.01, // 0 - 1
-        private scale = 0.9,
-        private blurStdDeviation = 0, // 0 - 1
-        private brightness = 1, // 1 is default
-        private saturate = 2, // 1 is default
-        private contrast = 4, // 1 is default
-        private hueRotate = 0, // 0 (deg) is default
-        private useSharpness = true,
-        private noise = 0.1, // 0-1
-        private globalCompositeOperation = 'hard-light',
-        private globalCompositeAlpha = 0.5,
-        private addEmojiBefore = true,
-        private addEmojiAfter = false,
-        private useOverlay = false,
-        private convFilterId: string,
-        private blurFilterId: string
-    ) {
-        this.img.onload = async () => {
-            this.canvas = this.document.createElement('canvas');
-            this.width = this.canvas.width = this.img.width;
-            this.height = this.canvas.height = this.img.height;
-            this.ctx = this.canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
+    private blurFilterId!: string;
+    private convFilterId!: string;
+    public convFilterKernel!: string;
+    private numberOfDips = 1;
+    private totalJpegs = 1;
+    private jpegQuality = 0.01; // 0 - 1
+    private scale = 1;
+    private blurStdDeviation = 0; // 0 - 1
+    private brightness = 1; // 1 is default
+    private saturate = 2; // 1 is default
+    private contrast = 4; // 1 is default
+    private hueRotate = 0; // 0 (deg) is default
+    private useSharpness = true;
+    private noise = 0.1; // 0-1
+    private globalCompositeOperation = 'hard-light';
+    private globalCompositeAlpha = 0.5;
+    private addEmojiBefore = false;
+    private addEmojiAfter = true;
+    private useOverlay = false;
 
-            this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height);
+    static get properties() {
+        return {
+            src: { type: String, reflectToAttribute: true }, // 1 is default
+            saturate: { type: Number, reflectToAttribute: true }, // 1 is default
+            contrast: { type: Number, reflectToAttribute: true }, // 1 is default
+            numberOfDips: { type: Number },
+            totalJpegs: { type: Number },
+            jpegQuality: { type: Number }, // 0 - 1
+            scale: { type: Number },
+            blurStdDeviation: { type: Number }, // 0 - 1
+            brightness: { type: Number }, // 1 is default
+            hueRotate: { type: Number }, // 0 (deg) is default
+            useSharpness: { type: Boolean },
+            noise: { type: Number }, // 0-1
+            globalCompositeOperation: { type: String },
+            globalCompositeAlpha: { type: Number },
+            addEmojiBefore: { type: Boolean },
+            addEmojiAfter: { type: Boolean },
+            useOverlay: { type: Boolean },
+            blurFilterId: { type: String, value: 'blurFilterId' },
+            convFilterId: { type: String, value: 'convFilterId' },
+            convFilterKernel: {
+                type: String,
+                value: `
+                     0  -1   0
+                    -1   5  -1
+                     0  -1   0
+                `
+            }
 
-            this.originalImg = new Image();
-            this.originalImg.src = this.img.src;
-            await this._fry();
+        }
+    }
+
+    static get observers() {
+        return [
+            '_propertiesUpdated('
+            + Object.keys(FriedMeme.properties).join(',')
+            + ')'
+        ]
+    }
+
+    _propertiesUpdated() {
+        console.log('Enter _propertiesUpdated');
+        if (this.originalImg){
+            console.log('Set srcimg to ', this.originalImg.src);
+            (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
+            this.connectedCallback();
+    }
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        (this.$.srcimg as HTMLImageElement).onload = () => {
+            this._loaded = true;
+            this._process();
         };
     }
 
+    private async _process() {
+        console.log('Enter _process');
+
+        if (!this._loaded || this._running) {
+            console.log('Bail from _process:: loaded=%s, running=%s', this._loaded, this._running);
+            return;
+        }
+
+        this.img = this.$.srcimg as HTMLImageElement;
+        this.img.onload = null;
+        this.canvas = document.createElement('canvas');
+        // What size to opeate upon...?
+        this.width = this.canvas.width = this.img.width;
+        this.height = this.canvas.height = this.img.height;
+        this.ctx = this.canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
+
+        this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
+
+        this.originalImg = new Image();
+        this.originalImg.src = this.img.src;
+        await this._fry();
+        console.log('Leave _process');
+    }
+
     private async _fry(currentDip = 1) {
+        console.log('Enter _fry');
+        this._running = true;
+
         if (this.numberOfDips > 1) {
             throw new Error('Only supporting one dip now');
         }
@@ -78,6 +156,9 @@ export class FriedMeme {
         }
 
         await this._losslessSave();
+
+        this._running = false;
+        console.log('Leave _fry');
     }
 
     private async _filterImage(
@@ -94,7 +175,7 @@ export class FriedMeme {
 
         console.log(this.ctx.filter);
 
-        this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height);
+        this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
         if (this.noise > 0) {
             this.addNoise();
@@ -104,7 +185,7 @@ export class FriedMeme {
         //     this._addEmoji();
         // }
 
-        const canvas2: HTMLCanvasElement = this.document.createElement('canvas');
+        const canvas2: HTMLCanvasElement = document.createElement('canvas');
         canvas2.width = this.width;
         canvas2.height = this.height;
         const ctx2: CanvasRenderingContext2DExtended = canvas2.getContext('2d')! as CanvasRenderingContext2DExtended;
@@ -117,7 +198,7 @@ export class FriedMeme {
     private _overlay() {
         // this.globalCompositeOperation;
         // return;
-        const canvas: HTMLCanvasElement = this.document.createElement('canvas');
+        const canvas: HTMLCanvasElement = document.createElement('canvas');
         const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         canvas.width = this.width;
         canvas.height = this.height;
@@ -142,24 +223,30 @@ export class FriedMeme {
         await this._saveToImg('image/png', 1);
     }
 
-    private async _lossySave() {
+    private _resize(width: number, height: number) {
         let canvas: HTMLCanvasElement = document.createElement('canvas');
         let ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
-        canvas.width = this.width * this.scale;
-        canvas.height = this.height * this.scale;
+        canvas.width = width;
+        canvas.height = height;
         ctx.drawImage(this.canvas,
             0, 0, this.canvas.width, this.canvas.height,
             0, 0, canvas.width, canvas.height,
         );
         this.canvas = canvas;
         this.ctx = ctx;
+    }
 
+    private async _lossySave() {
+        // Make even worse:
+        if (this.scale !== 1) {
+            this._resize(this.width * this.scale, this.height * this.scale);
+            this._resize(this.width, this.height);
+        }
         const quality = Math.max(0, this.jpegQuality + Math.log(this.jpegItteration) * 0.5);
         console.log('quality', quality);
         await this._saveToImg(
             'image/jpeg',
             quality
-            // this.jpegQuality
         );
     }
 
@@ -277,5 +364,31 @@ export class FriedMeme {
 
         this.ctx.restore();
     }
-}
 
+    static get template() {
+        // return html`${view}`; Polymer bug prevents this working.
+        return html`
+        <style>
+            :host {
+                display: block;
+            }
+            svg {
+                width: 0; height: 0;
+            }
+            img {
+                box-shadow: 0pt 2pt 2pt 2pt rgba(0,0,0,0.22);
+            }
+        </style>
+        
+        <svg>
+            <filter id="[[convFilterId]]">
+                <feConvolveMatrix order="3 3" preserveAlpha="true" kernelMatrix="[[convFilterKernel]]" />
+            </filter>
+            <filter id="[[blurFilterId]]">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="[[blurStdDeviation]]" />
+            </filter>
+        </svg>
+        
+        <img id="srcimg" src="[[src]]" />`;
+    }
+}
