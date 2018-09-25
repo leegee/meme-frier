@@ -23,10 +23,10 @@ module.exports = {
   },
   module: {
     rules: [
-      // {
-      //   test: /\.html$/,
-      //   use:  'html-loader'
-      // },
+      {
+        test: /\.html$/,
+        use:  'html-loader'
+      },
       // {
       //   test: /\.txt$/,
       //   use: 'raw-loader'
@@ -40,8 +40,7 @@ module.exports = {
   },
   resolve: {
     extensions: [
-      '.ts', '.js'
-      // , '.html', '.txt'
+      '.ts', '.js' , '.html' // , '.txt'
     ]
   },
   plugins: [

@@ -4,6 +4,7 @@ export class MemeFrier extends PolymerElement {
     static DebounceMs = 250;
     private _lastCallEvent: number | null = null;
 
+    src!: string;
     saturation: number = 2;
     contrast: number = 4;
     brightness: number = 2;
@@ -12,7 +13,7 @@ export class MemeFrier extends PolymerElement {
     totalJpegs: number = 22;
     useOverlay: boolean = true;
     noise: number = 0.2;
-    src!: string;
+    hueRotate: number = 0;
 
     constructor() {
         super();
@@ -20,6 +21,7 @@ export class MemeFrier extends PolymerElement {
 
     static get properties() {
         return {
+            src: { type: String, reflectToAttribute: true, notify: true },
             saturation: { type: Number, reflectToAttribute: true, notify: true },
             contrast: { type: Number, reflectToAttribute: true, notify: true },
             brightness: { type: Number, reflectToAttribute: true, notify: true },
@@ -28,7 +30,7 @@ export class MemeFrier extends PolymerElement {
             totalJpegs: { type: Number, reflectToAttribute: true, notify: true },
             useOverlay: { type: Number, reflectToAttribute: true, notify: true },
             noise: { type: Number, reflectToAttribute: true, notify: true },
-            src: { type: String, reflectToAttribute: true, notify: true }
+            hueRotate: { type: Number, reflectToAttribute: true, notify: true }
         }
     }
 
@@ -50,6 +52,7 @@ export class MemeFrier extends PolymerElement {
             total-jpegs={{totalJpegs}}
             use-overlay={{useOverlay}}
             noise={{noise}}
+            hueRotate={{hueRotate}}
         ></fried-meme>
 
         <ranged-input class='vertical'
@@ -86,6 +89,12 @@ export class MemeFrier extends PolymerElement {
             label="Iterations" 
             value={{totalJpegs}}
             min=1 max=50 step=1
+        ></ranged-input>
+
+        <ranged-input class='vertical'
+            label="Hue Rotate" 
+            value={{hueRotate}}
+            min=-180 max=180 step=10
         ></ranged-input>
         `;
     }
