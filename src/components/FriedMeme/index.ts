@@ -4,6 +4,11 @@ import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 export class FriedMeme extends PolymerElement {
     public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
 
+    static DebounceMs = 250;
+
+    private _lastCallTime: number = 0;
+    private _lastCallEvent: number | null = null;
+
     private img!: HTMLImageElement;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
@@ -61,6 +66,19 @@ export class FriedMeme extends PolymerElement {
     connectedCallback() {
         super.connectedCallback();
         (<HTMLImageElement> this.$.srcimg).onload = () => { this._process(); };
+    }
+
+    changeHandler(e) {
+        console.log('Meme: update the meme!', this.saturate, this.contrast);
+        const now = new Date().getTime();
+        if (now > this._lastCallTime + FriedMeme.DebounceMs) {
+            if (this._lastCallEvent) {
+                clearTimeout( this._lastCallEvent );
+            }
+            this._lastCallEvent = setTimeout( () => { this._process() }, FriedMeme.DebounceMs );
+        } else {
+            this._process();
+        }
     }
 
     private async _process() {
