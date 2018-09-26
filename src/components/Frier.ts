@@ -113,7 +113,10 @@ export class MemeFrier extends PolymerElement {
             </div>
 
             <div id="buttons">
-                <label><input type="checkbox" checked="{{useOverlay:change}}">Use overlay</label>
+                <label>
+                    <input id="useOverlay" type="checkbox" checked="{{useOverlay}}">
+                    Use overlay
+                </label>
                 <div>
                     <button id="rotate45">Rotate</button>
                 </div>
@@ -149,6 +152,10 @@ export class MemeFrier extends PolymerElement {
 
         this.$.meme.addEventListener("click", (e: Event) => {
             (this.$.chooseFile as HTMLElement).click();
+        });
+
+        this.$.useOverlay.addEventListener("change", (e:Event) => {
+            this.useOverlay = (this.$.useOverlay as HTMLInputElement).checked;
         });
 
         this.$.chooseFile.addEventListener("change", (e: Event) => {
