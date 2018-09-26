@@ -18,11 +18,16 @@ export class MemeFrier extends PolymerElement {
 
     connectedCallback() {
         super.connectedCallback();
+        this.$.save.addEventListener("click", (e: Event) => {
+            (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("save-image"));
+        });
+        this.$.load.addEventListener("click", (e: Event) => {
+            (this.$.chooseFile as HTMLElement).click();
+        });
         this.$.meme.addEventListener("click", (e: Event) => {
             (this.$.chooseFile as HTMLElement).click();
         });
         this.$.chooseFile.addEventListener("change", (e: Event) => {
-            console.log('Choose file');
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
                 this.$.meme.dispatchEvent(new CustomEvent('new-image', { detail: window.URL.createObjectURL(file) }));
@@ -55,6 +60,12 @@ export class MemeFrier extends PolymerElement {
         #chooseFile {
             display: none;
         }
+        #controls {
+            display: block;
+        }
+        #buttons button {
+            margin: 1em;
+        }
         </style>
         
         <fried-meme
@@ -73,47 +84,54 @@ export class MemeFrier extends PolymerElement {
 
         <input type="file" id="chooseFile">
 
-        <ranged-input class="vertical"
-            label="Saturation" 
-            value={{saturation}}
-            min=0 max=4 step=0.1 
-        ></ranged-input>
+        <div id="controls">
+            <ranged-input class="vertical"
+                label="Saturation" 
+                value={{saturation}}
+                min=0 max=4 step=0.1 
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Contrast" 
-            value={{contrast}}
-            min=0 max=10 step=0.5 
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Contrast" 
+                value={{contrast}}
+                min=0 max=10 step=0.5 
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Brightness" 
-            value={{brightness}}
-            min=0 max=10 step=0.5 
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Brightness" 
+                value={{brightness}}
+                min=0 max=10 step=0.5 
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Quality" 
-            value={{jpegQuality}}
-            min=0 max=1 step=0.05 
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Quality" 
+                value={{jpegQuality}}
+                min=0 max=1 step=0.05 
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Noise" 
-            value={{noise}}
-            min=0 max=1 step=0.01
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Noise" 
+                value={{noise}}
+                min=0 max=1 step=0.01
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Iterations" 
-            value={{totalJpegs}}
-            min=1 max=50 step=1
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Iterations" 
+                value={{totalJpegs}}
+                min=1 max=50 step=1
+            ></ranged-input>
 
-        <ranged-input class="vertical"
-            label="Hue Rotate" 
-            value={{hueRotate}}
-            min="-180" max="180" step="10"
-        ></ranged-input>
+            <ranged-input class="vertical"
+                label="Hue Rotate" 
+                value={{hueRotate}}
+                min="-180" max="180" step="10"
+            ></ranged-input>
+
+            <div id="buttons">
+                <button id="load">Load</button>
+                <button id="save">Save</button>
+            </div>
+        </div>
         `;
     }
 

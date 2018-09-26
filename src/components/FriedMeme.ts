@@ -1,3 +1,10 @@
+/**
+ * Also listens for these custom events:
+ * 
+ * * `new-image` where `Event.detail` is a Base64-encoded data URL for the image.
+ 
+ * * `save-image`
+ */
 import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 // import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
@@ -11,6 +18,7 @@ export class FriedMeme extends PolymerElement {
     private _running = false;
 
     private img!: HTMLImageElement;
+    private lastBlob!: Blob;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
     private originalImg!: HTMLImageElement;
@@ -71,6 +79,36 @@ export class FriedMeme extends PolymerElement {
         }
     }
 
+    static get template() {
+        // return html`${view}`; Polymer bug prevents this working.
+        return html`
+        <style>
+            :host {
+                display: inline-block;
+            }
+            svg {
+                width: 0; height: 0;
+            }
+            img {
+                object-fit: scale-down;
+                max-width: 800px;
+                max-height: 800px;
+            }
+        </style>
+        
+        <svg>
+            <filter id="[[convFilterId]]">
+                <feConvolveMatrix order="3 3" preserveAlpha="true" kernelMatrix="[[convFilterKernel]]" />
+            </filter>
+            <filter id="[[blurFilterId]]">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="[[blurStdDeviation]]" />
+            </filter>
+        </svg>
+        
+        <img id="srcimg" src="[[src]]" />
+        `;
+    }
+
     static get observers() {
         return [
             '_propertiesUpdated('
@@ -81,7 +119,11 @@ export class FriedMeme extends PolymerElement {
 
     ready() {
         super.ready();
-        this.addEventListener('new-image', (e) => {
+        this.addEventListener('save-image', () => {
+            this.saveImage();
+        });
+
+        this.addEventListener('new-image', (e: CustomEvent | Event) => {
             this.img.src = (this.$.srcimg as HTMLImageElement).src = (e as CustomEvent).detail;
             this.connectedCallback();
         });
@@ -279,6 +321,7 @@ export class FriedMeme extends PolymerElement {
 
     private _replaceImgWithJpegBlob(blob: Blob) {
         return new Promise((resolve, reject) => {
+            this.lastBlob = blob;
             const url = URL.createObjectURL(blob);
             const previousOnLoad = this.img.onload;
             const previousOnError = this.img.onerror;
@@ -376,34 +419,15 @@ export class FriedMeme extends PolymerElement {
         this.ctx.restore();
     }
 
-    static get template() {
-        // return html`${view}`; Polymer bug prevents this working.
-        return html`
-        <style>
-            :host {
-                display: block;
-            }
-            svg {
-                width: 0; height: 0;
-            }
-            img {
-                box-shadow: 0pt 2pt 2pt 2pt rgba(0,0,0,0.22);
-                object-fit: scale-down;
-                max-width: 800px;
-                max-height: 800px;
-            }
-        </style>
-        
-        <svg>
-            <filter id="[[convFilterId]]">
-                <feConvolveMatrix order="3 3" preserveAlpha="true" kernelMatrix="[[convFilterKernel]]" />
-            </filter>
-            <filter id="[[blurFilterId]]">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="[[blurStdDeviation]]" />
-            </filter>
-        </svg>
-        
-        <img id="srcimg" src="[[src]]" />
-        `;
+    private saveImage() {
+        const url = URL.createObjectURL(this.lastBlob);
+        const a = document.createElement('a');
+        a.setAttribute('download', 'true');
+        a.setAttribute('href', url );
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
     }
+
 }
