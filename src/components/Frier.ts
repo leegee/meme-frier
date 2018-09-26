@@ -74,7 +74,7 @@ export class MemeFrier extends PolymerElement {
             saturate={{saturation}}
             contrast={{contrast}}
             brightness={{brightness}}
-            hueRotate={{hueRotate}}
+            hue-rotate={{hueRotate}}
             scale={{scale}}
             jpeg-quality={{jpegQuality}}
             total-jpegs={{totalJpegs}}
