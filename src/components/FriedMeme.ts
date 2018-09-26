@@ -438,8 +438,7 @@ export class FriedMeme extends PolymerElement {
 
     private rotate45(){
         const parsed = (this.$.srcimg as HTMLElement).style.transform!.match(/rotate\((\d+)deg\)/);
-        let deg = parsed? parseInt(parsed[1]) : 0;
-        deg += 90;
+        let deg = parsed? parseInt(parsed[1]) + 90 : 90;
         if (deg > 270) {
             deg = 0;
         }
