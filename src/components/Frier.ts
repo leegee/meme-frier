@@ -18,11 +18,15 @@ export class MemeFrier extends PolymerElement {
 
     connectedCallback() {
         super.connectedCallback();
+        this.$.meme.addEventListener("click", (e: Event) => {
+            (this.$.chooseFile as HTMLElement).click();
+        });
         this.$.chooseFile.addEventListener("change", (e: Event) => {
             console.log('Choose file');
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
                 this.$.meme.dispatchEvent(new CustomEvent('new-image', { detail: window.URL.createObjectURL(file) }));
+                // TODO URL.revokeObjectURL((e as CustomEvent).detail);
             }
         }, false);
     }
@@ -47,6 +51,9 @@ export class MemeFrier extends PolymerElement {
         <style>
         :host { 
             display: block;
+        }
+        #chooseFile {
+            display: none;
         }
         </style>
         

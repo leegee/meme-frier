@@ -11,8 +11,6 @@ export class FriedMeme extends PolymerElement {
     private _running = false;
 
     private img!: HTMLImageElement;
-    private newImg!: File;
-    // private src!: string;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
     private originalImg!: HTMLImageElement;
@@ -43,7 +41,6 @@ export class FriedMeme extends PolymerElement {
     static get properties() {
         return {
             src: { type: String, reflectToAttribute: true }, // 1 is default
-            newImg: { type: File },
             saturate: { type: Number }, // 1 is default
             contrast: { type: Number }, // 1 is default
             brightness: { type: Number }, // 1 is default
@@ -82,10 +79,9 @@ export class FriedMeme extends PolymerElement {
         ]
     }
 
-    ready(){
+    ready() {
         super.ready();
         this.addEventListener('new-image', (e) => {
-            console.log('new image: ', (e as CustomEvent).detail);
             this.img.src = (this.$.srcimg as HTMLImageElement).src = (e as CustomEvent).detail;
             this.connectedCallback();
         });
@@ -117,10 +113,7 @@ export class FriedMeme extends PolymerElement {
             return;
         }
 
-        if (this.newImg) {
-            console.log('****', this.newImg)
-        }
-        console.log('----', this.newImg)
+        document.body.style.cursor = 'wait';
 
         this.img = this.$.srcimg as HTMLImageElement;
         this.img.onload = null;
@@ -174,6 +167,7 @@ export class FriedMeme extends PolymerElement {
 
         await this._losslessSave();
 
+        document.body.style.cursor = 'default';
         this._running = false;
         console.log('Leave _fry');
     }
