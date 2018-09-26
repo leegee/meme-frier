@@ -395,6 +395,8 @@ export class FriedMeme extends PolymerElement {
             img {
                 box-shadow: 0pt 2pt 2pt 2pt rgba(0,0,0,0.22);
                 object-fit: scale-down;
+                max-width: 800px;
+                max-height: 800px;
             }
         </style>
         
@@ -407,6 +409,7 @@ export class FriedMeme extends PolymerElement {
             </filter>
         </svg>
         
-        <img id="srcimg" src="[[src]]" />`;
+        <img id="srcimg" src="[[src]]" />
+        `;
     }
 }
