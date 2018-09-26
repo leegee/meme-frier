@@ -11,6 +11,7 @@ export class FriedMeme extends PolymerElement {
     private _running = false;
 
     private img!: HTMLImageElement;
+    private newImg!: File;
     // private src!: string;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
@@ -42,15 +43,16 @@ export class FriedMeme extends PolymerElement {
     static get properties() {
         return {
             src: { type: String, reflectToAttribute: true }, // 1 is default
-            saturate: { type: Number, reflectToAttribute: true }, // 1 is default
-            contrast: { type: Number, reflectToAttribute: true }, // 1 is default
+            newImg: { type: File },
+            saturate: { type: Number }, // 1 is default
+            contrast: { type: Number }, // 1 is default
+            brightness: { type: Number }, // 1 is default
+            hueRotate: { type: Number },
             numberOfDips: { type: Number },
             totalJpegs: { type: Number },
             jpegQuality: { type: Number }, // 0 - 1
             scale: { type: Number },
             blurStdDeviation: { type: Number }, // 0 - 1
-            brightness: { type: Number }, // 1 is default
-            hueRotate: { type: Number }, // 0 (deg) is default
             useSharpness: { type: Boolean },
             noise: { type: Number }, // 0-1
             globalCompositeOperation: { type: String },
@@ -80,30 +82,45 @@ export class FriedMeme extends PolymerElement {
         ]
     }
 
+    ready(){
+        super.ready();
+        this.addEventListener('new-image', (e) => {
+            console.log('new image: ', (e as CustomEvent).detail);
+            this.img.src = (this.$.srcimg as HTMLImageElement).src = (e as CustomEvent).detail;
+            this.connectedCallback();
+        });
+    }
+
+
     _propertiesUpdated() {
         console.log('Enter _propertiesUpdated');
-        if (this.originalImg){
+        if (this.originalImg) {
             console.log('Set srcimg to ', this.originalImg.src);
             (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
             this.connectedCallback();
-    }
+        }
     }
 
     connectedCallback() {
         super.connectedCallback();
         (this.$.srcimg as HTMLImageElement).onload = () => {
             this._loaded = true;
-            this._process();
+            this._processChangedProperties();
         };
     }
 
-    private async _process() {
-        console.log('Enter _process');
+    private async _processChangedProperties() {
+        console.log('Enter _processChangedProperties');
 
         if (!this._loaded || this._running) {
-            console.log('Bail from _process:: loaded=%s, running=%s', this._loaded, this._running);
+            console.log('Bail from _processChangedProperties:: loaded=%s, running=%s', this._loaded, this._running);
             return;
         }
+
+        if (this.newImg) {
+            console.log('****', this.newImg)
+        }
+        console.log('----', this.newImg)
 
         this.img = this.$.srcimg as HTMLImageElement;
         this.img.onload = null;
@@ -118,7 +135,7 @@ export class FriedMeme extends PolymerElement {
         this.originalImg = new Image();
         this.originalImg.src = this.img.src;
         await this._fry();
-        console.log('Leave _process');
+        console.log('Leave _processChangedProperties');
     }
 
     private async _fry(currentDip = 1) {
@@ -173,7 +190,7 @@ export class FriedMeme extends PolymerElement {
             + (this.blurStdDeviation > 0 ? `url("#${this.blurFilterId}") ` : '')
             ;
 
-        console.log(this.ctx.filter);
+        console.log('filter =', this.ctx.filter);
 
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -377,6 +394,7 @@ export class FriedMeme extends PolymerElement {
             }
             img {
                 box-shadow: 0pt 2pt 2pt 2pt rgba(0,0,0,0.22);
+                object-fit: scale-down;
             }
         </style>
         
