@@ -19,29 +19,26 @@ export class RangedInput extends PolymerElement {
         return html`
         <style>
             :host {
-                border: 1px solid gray;
                 display: inline-block;
                 text-align: center;
                 margin: 0;
                 padding: 0;
-                width: 150pt;
-                height: 40pt;
+                font-face: caption;
+                width: 4em;
             }
             :host(.vertical) {
-                width: 40pt;
-                height: 150pt;
-                transform-origin: 75pt 75pt;
+                transform-origin: 100% 100%;
                 transform: rotate(-90deg);
             }
-            label, input {
-                display: inline-block;
+            :host label, :host input {
+                display: block;
             }
         </style>
 
         <label> 
             {{label}}
-            <input on-input="inputHandler" type="range" value="{{value::input}}" min="[[min]]" max="[[max]]" step="[[step]]">
         </label>
+        <input on-input="inputHandler" type="range" value="{{value::input}}" min="[[min]]" max="[[max]]" step="[[step]]">
         `;
     }
 
