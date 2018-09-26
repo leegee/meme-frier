@@ -4,6 +4,8 @@
  * * `new-image` where `Event.detail` is a Base64-encoded data URL for the image.
  
  * * `save-image`
+ * 
+ * * `rotate45`
  */
 import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
@@ -119,6 +121,10 @@ export class FriedMeme extends PolymerElement {
 
     ready() {
         super.ready();
+        this.addEventListener('rotate45', () => {
+            this.rotate45();
+        });
+
         this.addEventListener('save-image', () => {
             this.saveImage();
         });
@@ -428,6 +434,16 @@ export class FriedMeme extends PolymerElement {
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
+    }
+
+    private rotate45(){
+        const parsed = (this.$.srcimg as HTMLElement).style.transform!.match(/rotate\((\d+)deg\)/);
+        let deg = parsed? parseInt(parsed[1]) : 0;
+        deg += 90;
+        if (deg > 270) {
+            deg = 0;
+        }
+        (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
     }
 
 }

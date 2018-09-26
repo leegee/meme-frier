@@ -18,6 +18,9 @@ export class MemeFrier extends PolymerElement {
 
     connectedCallback() {
         super.connectedCallback();
+        this.$.rotate45.addEventListener("click", (e: Event) => {
+            (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
+        });
         this.$.save.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("save-image"));
         });
@@ -128,6 +131,8 @@ export class MemeFrier extends PolymerElement {
             ></ranged-input>
 
             <div id="buttons">
+                <label><input type="checkbox" checked="{{useOverlay:change}}">Use overlay</label>
+                <button id="rotate45">Rotate</button>
                 <button id="load">Load</button>
                 <button id="save">Save</button>
             </div>
