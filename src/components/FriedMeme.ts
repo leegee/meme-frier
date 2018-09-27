@@ -91,8 +91,8 @@ export class FriedMeme extends PolymerElement {
             }
             img {
                 object-fit: scale-down;
-                max-width: 800px;
-                max-height: 800px;
+                max-width: 100vw;
+                max-height: 50vh;
             }
         </style>
         
@@ -424,6 +424,7 @@ export class FriedMeme extends PolymerElement {
         this.ctx.restore();
     }
 
+    /** Saves at display size, not original size */
     private saveImage() {
         const url = URL.createObjectURL(this.lastBlob);
         const a = document.createElement('a');

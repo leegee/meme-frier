@@ -34,11 +34,12 @@ export class MemeFrier extends PolymerElement {
         }
         #controls {
             display: block;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
             text-align: left;
             background: #0003;
-            padding: 1em;
-            padding-bottom: 0;
-            margin-top: 1em;
+            padding-top: 1em;
         }
         #sliders {
             display: block;
@@ -203,7 +204,9 @@ export class MemeFrier extends PolymerElement {
         this.$.chooseFile.addEventListener("change", (e: Event) => {
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
-                this.$.meme.dispatchEvent(new CustomEvent('new-image', { detail: window.URL.createObjectURL(file) }));
+                this.$.meme.dispatchEvent(new CustomEvent('new-image', { 
+                    detail: URL.createObjectURL(file) }
+                ));
             }
         }, false);
 
@@ -221,7 +224,7 @@ export class MemeFrier extends PolymerElement {
                 const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
                 this.$.meme.dispatchEvent(
                     new CustomEvent('new-image', { 
-                        detail: window.URL.createObjectURL(file)
+                        detail: URL.createObjectURL(file)
                     })
                 );
             }
