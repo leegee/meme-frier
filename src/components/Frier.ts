@@ -130,7 +130,7 @@ export class MemeFrier extends PolymerElement {
 
             <div id="buttons" class="group">
 
-                <select id="globalCompositeOperations"></select>
+                <label>Filter:</label> <select id="globalCompositeOperations"></select>
 
                 <p>
                     <label>
@@ -163,7 +163,6 @@ export class MemeFrier extends PolymerElement {
     connectedCallback() {
         super.connectedCallback();
 
-        const select = this.$.globalCompositeOperations;
         this.globalCompositeOperations.forEach((i) => {
             const option = document.createElement('option');
             option.textContent = i;
@@ -171,7 +170,10 @@ export class MemeFrier extends PolymerElement {
             if (i === this.globalCompositeOperation) {
                 option.selected = true;
             }
-            select.appendChild(option);
+            this.$.globalCompositeOperations.appendChild(option);
+        });
+        this.$.globalCompositeOperations.addEventListener("change", (e: Event) => {
+            this.globalCompositeOperation = (e as any).path[0].value;
         });
 
         this.$.rotate45.addEventListener("click", (e: Event) => {
