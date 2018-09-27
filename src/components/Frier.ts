@@ -1,5 +1,5 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
-import {} from '@polymer/polymer/lib/elements/dom-repeat';
+import { } from '@polymer/polymer/lib/elements/dom-repeat';
 
 export class MemeFrier extends PolymerElement {
     src!: string;
@@ -16,6 +16,7 @@ export class MemeFrier extends PolymerElement {
     addEmojiAfter = true;
     globalCompositeOperation = 'hard-light';
     globalCompositeOperations!: Array<string>;
+    blurStdDeviation = 0;
 
     static get template() {
         return html`
@@ -73,6 +74,7 @@ export class MemeFrier extends PolymerElement {
             add-emoji-after={{addEmojiAfter}}
             noise={{noise}}
             global-composite-operation={{globalCompositeOperation}}
+            blur-std-deviation={{blurStdDeviation}}
         ></fried-meme>
 
         <div id="controls" class="group">
@@ -111,6 +113,12 @@ export class MemeFrier extends PolymerElement {
                     label="Iterations" 
                     value={{totalJpegs}}
                     min=1 max=50 step=1
+                ></ranged-input>
+
+                <ranged-input class="vertical"
+                    label="Blur" 
+                    value={{blurStdDeviation}}
+                    min="0" max="1" step="0.1"
                 ></ranged-input>
 
                 <ranged-input class="vertical"
@@ -156,7 +164,7 @@ export class MemeFrier extends PolymerElement {
         super.connectedCallback();
 
         const select = this.$.globalCompositeOperations;
-        this.globalCompositeOperations.forEach( (i) => {
+        this.globalCompositeOperations.forEach((i) => {
             const option = document.createElement('option');
             option.textContent = i;
             option.value = i;
@@ -164,7 +172,7 @@ export class MemeFrier extends PolymerElement {
                 option.selected = true;
             }
             select.appendChild(option);
-        });      
+        });
 
         this.$.rotate45.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
@@ -219,8 +227,9 @@ export class MemeFrier extends PolymerElement {
             useOverlay: { type: Number, reflectToAttribute: true, notify: true },
             noise: { type: Number, reflectToAttribute: true, notify: true },
             hueRotate: { type: Number, reflectToAttribute: true, notify: true },
+            blurStdDeviation: { type: Number, reflectToAttribute: true, notify: true },
             globalCompositeOperation: { type: String, reflectToAttribute: true, notify: true },
-            globalCompositeOperations: { 
+            globalCompositeOperations: {
                 type: Array,
                 value() {
                     return [
