@@ -129,6 +129,7 @@ export class FriedMeme extends PolymerElement {
 
         this.addEventListener('new-image', (e: CustomEvent | Event) => {
             this.img.src = (this.$.srcimg as HTMLImageElement).src = (e as CustomEvent).detail;
+            // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
             this.connectedCallback();
         });
     }

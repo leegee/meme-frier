@@ -37,13 +37,15 @@ export class MemeFrier extends PolymerElement {
             text-align: left;
             background: #0003;
             padding: 1em;
+            padding-bottom: 0;
             margin-top: 1em;
-            position: relative; 
         }
         #sliders {
             display: block;
             float: left;
             height: 10em;
+            overflow: auto;
+            width: auto;
         }
         ranged-input {
             text-align: center;
@@ -163,6 +165,12 @@ export class MemeFrier extends PolymerElement {
     connectedCallback() {
         super.connectedCallback();
 
+        ['useOverlay', 'addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
+            this.$[id].addEventListener("change", (e: Event) => {
+                this[id] = (this.$[id] as HTMLInputElement).checked;
+            });
+        });
+
         this.globalCompositeOperations.forEach((i) => {
             const option = document.createElement('option');
             option.textContent = i;
@@ -192,27 +200,30 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        ['useOverlay', 'addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
-            this.$[id].addEventListener("change", (e: Event) => {
-                this[id] = (this.$[id] as HTMLInputElement).checked;
-            });
-        });
-
         this.$.chooseFile.addEventListener("change", (e: Event) => {
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
                 this.$.meme.dispatchEvent(new CustomEvent('new-image', { detail: window.URL.createObjectURL(file) }));
-                // TODO URL.revokeObjectURL((e as CustomEvent).detail);
             }
         }, false);
 
-        this.$.meme.addEventListener("drop", function (e) { // (e: DragEvent) produces type error
-            console.log('drop');
+        this.$.meme.addEventListener("dragover", (e) => {
             e.preventDefault();
-            if ((e as DragEvent).dataTransfer.items && (e as DragEvent).dataTransfer.items[0].kind === 'file') {
-                const dropped = (e as DragEvent).dataTransfer.items[0].getAsString((str) => {
-                    console.log(str, dropped);
-                });
+        });
+
+        this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
+            console.log('drop', e);
+            console.log((e as DragEvent).dataTransfer.items[0]);
+            e.preventDefault();
+            if ((e as DragEvent).dataTransfer.items &&
+                (e as DragEvent).dataTransfer.items[0].kind === 'file'
+            ) {
+                const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
+                this.$.meme.dispatchEvent(
+                    new CustomEvent('new-image', { 
+                        detail: window.URL.createObjectURL(file)
+                    })
+                );
             }
         }, false);
     }
