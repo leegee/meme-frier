@@ -27,7 +27,7 @@ export class RangedInput extends PolymerElement {
                 width: 4em;
             }
             :host(.vertical) {
-                transform-origin: 100% 100%;
+                 transform-origin: 100% 100%; 
                 transform: rotate(-90deg);
             }
             :host label, :host input {

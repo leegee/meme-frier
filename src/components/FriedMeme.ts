@@ -14,10 +14,8 @@ import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 export class FriedMeme extends PolymerElement {
     public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
 
-    static DebounceMs = 250;
-
-    private _loaded = false;
-    private _running = false;
+    protected loaded = false;
+    protected working = false;
 
     private img!: HTMLImageElement;
     private lastBlob!: Blob;
@@ -148,7 +146,7 @@ export class FriedMeme extends PolymerElement {
     connectedCallback() {
         super.connectedCallback();
         (this.$.srcimg as HTMLImageElement).onload = () => {
-            this._loaded = true;
+            this.loaded = true;
             this._processChangedProperties();
         };
     }
@@ -156,12 +154,13 @@ export class FriedMeme extends PolymerElement {
     private async _processChangedProperties() {
         console.log('Enter _processChangedProperties');
 
-        if (!this._loaded || this._running) {
-            console.log('Bail from _processChangedProperties:: loaded=%s, running=%s', this._loaded, this._running);
+        if (!this.loaded || this.working) {
+            console.log('Bail from _processChangedProperties:: loaded=%s, running=%s', this.loaded, this.working);
             return;
         }
 
         document.body.style.cursor = 'wait';
+        this.working = true;
 
         this.img = this.$.srcimg as HTMLImageElement;
         this.img.onload = null;
@@ -181,7 +180,7 @@ export class FriedMeme extends PolymerElement {
 
     private async _fry(currentDip = 1) {
         console.log('Enter _fry');
-        this._running = true;
+        this.working = true;
 
         if (this.numberOfDips > 1) {
             throw new Error('Only supporting one dip now');
@@ -216,7 +215,7 @@ export class FriedMeme extends PolymerElement {
         await this._losslessSave();
 
         document.body.style.cursor = 'default';
-        this._running = false;
+        this.working = false;
         console.log('Leave _fry');
     }
 
@@ -233,6 +232,7 @@ export class FriedMeme extends PolymerElement {
             ;
 
         console.log('filter =', this.ctx.filter);
+        console.log('globalCompositeOperation=',this.globalCompositeOperation);
 
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -255,8 +255,6 @@ export class FriedMeme extends PolymerElement {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
     private _overlay() {
-        // this.globalCompositeOperation;
-        // return;
         const canvas: HTMLCanvasElement = document.createElement('canvas');
         const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         canvas.width = this.width;

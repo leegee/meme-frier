@@ -1,16 +1,21 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+import {} from '@polymer/polymer/lib/elements/dom-repeat';
 
 export class MemeFrier extends PolymerElement {
     src!: string;
-    saturation: number = 2;
-    contrast: number = 4;
-    brightness: number = 2;
-    scale: number = 1;
-    jpegQuality: number = 0.9;
-    totalJpegs: number = 22;
-    useOverlay: boolean = true;
-    noise: number = 0.2;
-    hueRotate: number = 0;
+    saturation = 2;
+    contrast = 4;
+    brightness = 2;
+    scale = 1;
+    jpegQuality = 0.9;
+    totalJpegs = 22;
+    noise = 0.2;
+    hueRotate = 0;
+    useOverlay = true;
+    addEmojiBefore = true;
+    addEmojiAfter = true;
+    globalCompositeOperation = 'hard-light';
+    globalCompositeOperations!: Array<string>;
 
     static get template() {
         return html`
@@ -27,29 +32,31 @@ export class MemeFrier extends PolymerElement {
             display: none;
         }
         #controls {
-            height: auto;
-            width: 100%;
             display: block;
+            text-align: left;
+            background: #0003;
+            padding: 1em;
+            margin-top: 1em;
+            position: relative; 
         }
         #sliders {
-            height: auto;
-            width: 70%;
-            height: auto;
             display: block;
             float: left;
+            height: 10em;
         }
         ranged-input {
+            text-align: center;
             margin: 1em;
         }
         #buttons {
-            display: block;
-            float: left;
-            text-align: left;
+            display: inline-block;
         }
         #buttons button {
             margin: 1em;
         }
         </style>
+
+        <input type="file" id="chooseFile">
 
         <fried-meme
             id="meme"
@@ -62,13 +69,14 @@ export class MemeFrier extends PolymerElement {
             jpeg-quality={{jpegQuality}}
             total-jpegs={{totalJpegs}}
             use-overlay={{useOverlay}}
+            add-emoji-before={{addEmojiBefore}}
+            add-emoji-after={{addEmojiAfter}}
             noise={{noise}}
+            global-composite-operation={{globalCompositeOperation}}
         ></fried-meme>
 
-        <input type="file" id="chooseFile">
-
         <div id="controls" class="group">
-            <div id="sliders">
+            <div id="sliders" class="group">
                 <ranged-input class="vertical"
                     label="Saturation" 
                     value={{saturation}}
@@ -112,31 +120,51 @@ export class MemeFrier extends PolymerElement {
                 ></ranged-input>
             </div>
 
-            <div id="buttons">
-                <label>
-                    <input id="useOverlay" type="checkbox" checked="{{useOverlay}}">
-                    Use overlay
-                </label>
-                <div>
+            <div id="buttons" class="group">
+
+                <select id="globalCompositeOperations"></select>
+
+                <p>
+                    <label>
+                        <input id="useOverlay" type="checkbox" checked="{{useOverlay}}">
+                        Use overlay
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <input id="addEmojiBefore" type="checkbox" checked="{{addEmojiBefore}}">
+                        Emoji before
+                    </label>
+                    <label>
+                        <input id="addEmojiAfter" type="checkbox" checked="{{addEmojiAfter}}">
+                        Emoji after
+                    </label>
+                </p>
+
+                <p>
                     <button id="rotate45">Rotate</button>
-                </div>
-                <div>
                     <button id="load">Load</button>
-                </div>
-                <div>
                     <button id="save">Save</button>
-                </div>
+                </p>
             </div>
         </div>
         `;
     }
 
-    constructor() {
-        super();
-    }
 
     connectedCallback() {
         super.connectedCallback();
+
+        const select = this.$.globalCompositeOperations;
+        this.globalCompositeOperations.forEach( (i) => {
+            const option = document.createElement('option');
+            option.textContent = i;
+            option.value = i;
+            if (i === this.globalCompositeOperation) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });      
 
         this.$.rotate45.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
@@ -154,8 +182,10 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        this.$.useOverlay.addEventListener("change", (e:Event) => {
-            this.useOverlay = (this.$.useOverlay as HTMLInputElement).checked;
+        ['useOverlay', 'addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
+            this.$[id].addEventListener("change", (e: Event) => {
+                this[id] = (this.$[id] as HTMLInputElement).checked;
+            });
         });
 
         this.$.chooseFile.addEventListener("change", (e: Event) => {
@@ -188,7 +218,16 @@ export class MemeFrier extends PolymerElement {
             totalJpegs: { type: Number, reflectToAttribute: true, notify: true },
             useOverlay: { type: Number, reflectToAttribute: true, notify: true },
             noise: { type: Number, reflectToAttribute: true, notify: true },
-            hueRotate: { type: Number, reflectToAttribute: true, notify: true }
+            hueRotate: { type: Number, reflectToAttribute: true, notify: true },
+            globalCompositeOperation: { type: String, reflectToAttribute: true, notify: true },
+            globalCompositeOperations: { 
+                type: Array,
+                value() {
+                    return [
+                        'hard-light', 'soft-light', 'overlay'
+                    ];
+                }
+            }
         }
     }
 }
