@@ -9,7 +9,7 @@
  */
 import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
-// import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import * as view from './FriedMeme.template.html';
 
 export class FriedMeme extends PolymerElement {
     public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
@@ -75,38 +75,13 @@ export class FriedMeme extends PolymerElement {
                      0  -1   0
                 `
             }
-
         }
     }
 
     static get template() {
-        // return html`${view}`; Polymer bug prevents this working.
-        return html`
-        <style>
-            :host {
-                display: inline-block;
-            }
-            svg {
-                width: 0; height: 0;
-            }
-            img {
-                object-fit: scale-down;
-                max-width: 100vw;
-                max-height: 50vh;
-            }
-        </style>
-        
-        <svg>
-            <filter id="[[convFilterId]]">
-                <feConvolveMatrix order="3 3" preserveAlpha="true" kernelMatrix="[[convFilterKernel]]" />
-            </filter>
-            <filter id="[[blurFilterId]]">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="[[blurStdDeviation]]" />
-            </filter>
-        </svg>
-        
-        <img id="srcimg" src="[[src]]" />
-        `;
+        // Because Polymer is not quite as advertised:
+        const stringArray = [`${view}`];
+        return html({ raw: stringArray, ...stringArray } as TemplateStringsArray);
     }
 
     static get observers() {
@@ -233,7 +208,7 @@ export class FriedMeme extends PolymerElement {
             ;
 
         console.log('filter =', this.ctx.filter);
-        console.log('globalCompositeOperation=',this.globalCompositeOperation);
+        console.log('globalCompositeOperation=', this.globalCompositeOperation);
 
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -429,16 +404,16 @@ export class FriedMeme extends PolymerElement {
         const url = URL.createObjectURL(this.lastBlob);
         const a = document.createElement('a');
         a.setAttribute('download', 'true');
-        a.setAttribute('href', url );
+        a.setAttribute('href', url);
         document.body.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
     }
 
-    private rotate45(){
+    private rotate45() {
         const parsed = (this.$.srcimg as HTMLElement).style.transform!.match(/rotate\((\d+)deg\)/);
-        let deg = parsed? parseInt(parsed[1]) + 90 : 90;
+        let deg = parsed ? parseInt(parsed[1]) + 90 : 90;
         if (deg > 270) {
             deg = 0;
         }

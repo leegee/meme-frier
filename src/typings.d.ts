@@ -1,9 +1,9 @@
 declare module "*.html" {
-    const content: string;
-    export default content;
+    const template: string;
+    export default template;
 }
 
 declare module "*.txt" {
-    const content: string;
-    export default content;
+    const template: string;
+    export default template;
 }
