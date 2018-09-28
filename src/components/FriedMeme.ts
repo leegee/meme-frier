@@ -45,7 +45,6 @@ export class FriedMeme extends PolymerElement {
     private globalCompositeAlpha = 0.5;
     private addEmojiBefore = false;
     private addEmojiAfter = true;
-    private useOverlay = false;
 
     static get properties() {
         return {
@@ -65,7 +64,6 @@ export class FriedMeme extends PolymerElement {
             globalCompositeAlpha: { type: Number },
             addEmojiBefore: { type: Boolean },
             addEmojiAfter: { type: Boolean },
-            useOverlay: { type: Boolean },
             blurFilterId: { type: String, value: 'blurFilterId' },
             convFilterId: { type: String, value: 'convFilterId' },
             convFilterKernel: {
@@ -177,9 +175,7 @@ export class FriedMeme extends PolymerElement {
             this._addEmoji();
         }
 
-        await this._filterImage(
-            // currentDip + 1 === this.numberOfDips
-        );
+        await this._filterImage();
 
         for (this.jpegItteration = 1; this.jpegItteration <= this.totalJpegs; this.jpegItteration++) {
             await this._lossySave();
@@ -191,7 +187,7 @@ export class FriedMeme extends PolymerElement {
             await this._fry(currentDip + 1);
         }
 
-        if (this.useOverlay) {
+        if (this.globalCompositeOperation.length) {
             this._overlay();
         }
 
@@ -206,9 +202,7 @@ export class FriedMeme extends PolymerElement {
         console.log('Leave _fry');
     }
 
-    private async _filterImage(
-        // withEmoji: boolean = false
-    ) {
+    private async _filterImage() {
         this.ctx.filter = ''
             + `saturate(${this.saturate}) `
             + (this.useSharpness ? `url("#${this.convFilterId}") ` : '')
@@ -226,10 +220,6 @@ export class FriedMeme extends PolymerElement {
         if (this.noise > 0) {
             this.addNoise();
         }
-
-        // if (withEmoji) {
-        //     this._addEmoji();
-        // }
 
         const canvas2: HTMLCanvasElement = document.createElement('canvas');
         canvas2.width = this.width;

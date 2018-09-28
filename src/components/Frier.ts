@@ -13,7 +13,6 @@ export class MemeFrier extends PolymerElement {
     totalJpegs = 22;
     noise = 0.2;
     hueRotate = 0;
-    useOverlay = true;
     addEmojiBefore = true;
     addEmojiAfter = true;
     globalCompositeOperation = 'hard-light';
@@ -28,7 +27,7 @@ export class MemeFrier extends PolymerElement {
     connectedCallback() {
         super.connectedCallback();
 
-        ['useOverlay', 'addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
+        ['addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
             this.$[id].addEventListener("change", (e: Event) => {
                 this[id] = (this.$[id] as HTMLInputElement).checked;
             });
@@ -66,8 +65,9 @@ export class MemeFrier extends PolymerElement {
         this.$.chooseFile.addEventListener("change", (e: Event) => {
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
-                this.$.meme.dispatchEvent(new CustomEvent('new-image', { 
-                    detail: URL.createObjectURL(file) }
+                this.$.meme.dispatchEvent(new CustomEvent('new-image', {
+                    detail: URL.createObjectURL(file)
+                }
                 ));
             }
         }, false);
@@ -85,7 +85,7 @@ export class MemeFrier extends PolymerElement {
             ) {
                 const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
                 this.$.meme.dispatchEvent(
-                    new CustomEvent('new-image', { 
+                    new CustomEvent('new-image', {
                         detail: URL.createObjectURL(file)
                     })
                 );
@@ -102,7 +102,6 @@ export class MemeFrier extends PolymerElement {
             scale: { type: Number, reflectToAttribute: true, notify: true },
             jpegQuality: { type: Number, reflectToAttribute: true, notify: true },
             totalJpegs: { type: Number, reflectToAttribute: true, notify: true },
-            useOverlay: { type: Number, reflectToAttribute: true, notify: true },
             noise: { type: Number, reflectToAttribute: true, notify: true },
             hueRotate: { type: Number, reflectToAttribute: true, notify: true },
             blurStdDeviation: { type: Number, reflectToAttribute: true, notify: true },
@@ -111,7 +110,12 @@ export class MemeFrier extends PolymerElement {
                 type: Array,
                 value() {
                     return [
-                        'hard-light', 'soft-light', 'overlay'
+                        'hard-light', 'soft-light', 'overlay',
+                        'source-over', 'source-in', 'source-out', 'source-atop',
+                        'destination-over', 'destination-in', 'destination-out', 'destination-atop',
+                        'lighter', 'copy', 'xor', 'multiply', 'screen', 'darken', 'lighten',
+                        'color-dodge', 'color-burn', 'difference', 'exclusion',
+                        'hue', 'saturation', 'color', 'luminosity'
                     ];
                 }
             }
