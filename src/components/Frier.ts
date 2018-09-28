@@ -1,5 +1,7 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 import { } from '@polymer/polymer/lib/elements/dom-repeat';
+import { getTemplate } from './lib/getTemplate';
+import * as view from './Frier.template.html';
 
 export class MemeFrier extends PolymerElement {
     src!: string;
@@ -19,147 +21,7 @@ export class MemeFrier extends PolymerElement {
     blurStdDeviation = 0;
 
     static get template() {
-        return html`
-        <style>
-        :host { 
-            display: block;
-        }
-        .group:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-        #chooseFile {
-            display: none;
-        }
-        #controls {
-            display: block;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            text-align: left;
-            background: #0003;
-            padding-top: 1em;
-        }
-        #sliders {
-            display: block;
-            float: left;
-            height: 10em;
-            overflow: auto;
-            width: auto;
-        }
-        ranged-input {
-            text-align: center;
-            margin: 1em;
-        }
-        #buttons {
-            display: inline-block;
-        }
-        #buttons button {
-            margin: 1em;
-        }
-        </style>
-
-        <input type="file" id="chooseFile">
-
-        <fried-meme
-            id="meme"
-            src=[[src]]
-            saturate={{saturation}}
-            contrast={{contrast}}
-            brightness={{brightness}}
-            hue-rotate={{hueRotate}}
-            scale={{scale}}
-            jpeg-quality={{jpegQuality}}
-            total-jpegs={{totalJpegs}}
-            use-overlay={{useOverlay}}
-            add-emoji-before={{addEmojiBefore}}
-            add-emoji-after={{addEmojiAfter}}
-            noise={{noise}}
-            global-composite-operation={{globalCompositeOperation}}
-            blur-std-deviation={{blurStdDeviation}}
-        ></fried-meme>
-
-        <div id="controls" class="group">
-            <div id="sliders" class="group">
-                <ranged-input class="vertical"
-                    label="Saturation" 
-                    value={{saturation}}
-                    min=0 max=4 step=0.1 
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Contrast" 
-                    value={{contrast}}
-                    min=0 max=10 step=0.5 
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Brightness" 
-                    value={{brightness}}
-                    min=0 max=10 step=0.5 
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Quality" 
-                    value={{jpegQuality}}
-                    min=0 max=1 step=0.05 
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Noise" 
-                    value={{noise}}
-                    min=0 max=1 step=0.01
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Iterations" 
-                    value={{totalJpegs}}
-                    min=1 max=50 step=1
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Blur" 
-                    value={{blurStdDeviation}}
-                    min="0" max="1" step="0.1"
-                ></ranged-input>
-
-                <ranged-input class="vertical"
-                    label="Hue Rotate" 
-                    value={{hueRotate}}
-                    min="-180" max="180" step="10"
-                ></ranged-input>
-            </div>
-
-            <div id="buttons" class="group">
-
-                <label>Filter:</label> <select id="globalCompositeOperations"></select>
-
-                <p>
-                    <label>
-                        <input id="useOverlay" type="checkbox" checked="{{useOverlay}}">
-                        Use overlay
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        <input id="addEmojiBefore" type="checkbox" checked="{{addEmojiBefore}}">
-                        Emoji before
-                    </label>
-                    <label>
-                        <input id="addEmojiAfter" type="checkbox" checked="{{addEmojiAfter}}">
-                        Emoji after
-                    </label>
-                </p>
-
-                <p>
-                    <button id="rotate45">Rotate</button>
-                    <button id="load">Load</button>
-                    <button id="save">Save</button>
-                </p>
-            </div>
-        </div>
-        `;
+        return getTemplate(view);
     }
 
 

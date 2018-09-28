@@ -1,4 +1,6 @@
-import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+import { PolymerElement } from '@polymer/polymer/polymer-element';
+import { getTemplate } from './lib/getTemplate';
+import * as view from './RangedInput.template.html';
 
 export class RangedInput extends PolymerElement {
     value!: string | number;
@@ -16,30 +18,7 @@ export class RangedInput extends PolymerElement {
     }
 
     static get template() {
-        return html`
-        <style>
-            :host {
-                display: inline-block;
-                text-align: center;
-                margin: 0;
-                padding: 0;
-                font-face: caption;
-                width: 4em;
-            }
-            :host(.vertical) {
-                 transform-origin: 100% 100%; 
-                transform: rotate(-90deg);
-            }
-            :host label, :host input {
-                display: block;
-            }
-        </style>
-
-        <label> 
-            {{label}}
-        </label>
-        <input on-input="inputHandler" type="range" value="{{value::input}}" min="[[min]]" max="[[max]]" step="[[step]]">
-        `;
+        return getTemplate(view);
     }
 
     inputHandler() {

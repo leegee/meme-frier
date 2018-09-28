@@ -7,8 +7,9 @@
  * 
  * * `rotate45`
  */
-import { CanvasRenderingContext2DExtended } from '../lib/CanvasRenderingContext2DExtended.interface';
-import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+import { CanvasRenderingContext2DExtended } from './lib/CanvasRenderingContext2DExtended.interface';
+import { PolymerElement } from '@polymer/polymer/polymer-element';
+import { getTemplate } from './lib/getTemplate';
 import * as view from './FriedMeme.template.html';
 
 export class FriedMeme extends PolymerElement {
@@ -79,9 +80,10 @@ export class FriedMeme extends PolymerElement {
     }
 
     static get template() {
-        // Because Polymer is not quite as advertised:
-        const stringArray = [`${view}`];
-        return html({ raw: stringArray, ...stringArray } as TemplateStringsArray);
+        return getTemplate(view);
+        // // Because Polymer is not quite as advertised:
+        // const stringArray = [`${view}`];
+        // return html({ raw: stringArray, ...stringArray } as TemplateStringsArray);
     }
 
     static get observers() {
