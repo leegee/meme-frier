@@ -8,8 +8,8 @@ const webpack = require('webpack');
 module.exports = {
   entry: {
     app: [
-        'webpack-dev-server/client?http://localhost:8080',
-        './src/index'
+      'webpack-dev-server/client?http://localhost:8080',
+      './src/index'
     ]
   },
   devtool: 'source-map',
@@ -25,7 +25,7 @@ module.exports = {
     rules: [
       {
         test: /\.html$/,
-        use:  'html-loader'
+        use: 'html-loader'
       },
       // {
       //   test: /\.txt$/,
@@ -40,8 +40,11 @@ module.exports = {
   },
   resolve: {
     extensions: [
-      '.ts', '.js' , '.html' // , '.txt'
-    ]
+      '.ts', '.js', '.html' // , '.txt'
+    ],
+    alias: {
+      '../neon-animation': 'neon-animation-polymer-3'
+    }
   },
   plugins: [
     new CleanWebpackPlugin(['dist'], { verbose: true, root: path.resolve(__dirname) }),
@@ -61,6 +64,10 @@ module.exports = {
         ),
         to: './webcomponentjs',
         flatten: true
+      },
+      {
+        from: path.resolve(__dirname, './node_modules/web-animations-js/*{.js,.js.map}'),
+        to: './web-animations-js/[name].[ext]'
       }
     ]),
     new webpack.IgnorePlugin(/vertx/),

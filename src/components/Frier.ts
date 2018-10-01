@@ -13,7 +13,7 @@ import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/paper-slider/paper-slider';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-item/paper-item';
+import {PaperItemElement} from '@polymer/paper-item/paper-item';
 import '@polymer/paper-listbox/paper-listbox';
 
 import { getTemplate } from './lib/getTemplate';
@@ -51,15 +51,15 @@ export class MemeFrier extends PolymerElement {
             });
         });
 
-        this.globalCompositeOperations.forEach((i) => {
-            const option = document.createElement('option');
-            option.textContent = i;
-            option.value = i;
-            if (i === this.globalCompositeOperation) {
-                option.selected = true;
-            }
-            this.$.globalCompositeOperations.appendChild(option);
-        });
+        // this.globalCompositeOperations.forEach((i) => {
+        //     const option = document.createElement('paper-item') as PaperItemElement;
+        //     option.textContent = i;
+        //     option.value = i;
+        //     if (i === this.globalCompositeOperation) {
+        //         option.selected = true;
+        //     }
+        //     this.$.globalCompositeOperations.appendChild(option);
+        // });
         this.$.globalCompositeOperations.addEventListener("change", (e: Event) => {
             this.globalCompositeOperation = (e as any).path[0].value;
         });
