@@ -22,7 +22,8 @@
     "@polymer/paper-icon-button": "^3.0.1",
     "@polymer/paper-slider": "^3.0.1",
     "@polymer/polymer": "^3.0.5",
-    "@webcomponents/webcomponentsjs": "1.0.14"
+    "@webcomponents/webcomponentsjs": "1.0.14",
+    "paper-checkbox": "^0.10.0"
   },
   "devDependencies": {
     "@polymer/iron-component-page": "^3.0.0-pre.20",

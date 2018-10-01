@@ -138,15 +138,14 @@ app-drawer {
             </div>
 
             <div class='group'>
-                <label>
-                    <input id="addEmojiBefore" type="checkbox" checked="{{addEmojiBefore}}">
+                <paper-checkbox id="addEmojiBefore" checked="{{addEmojiBefore}}">
                     <iron-icon icon='myicons:tag-faces'></iron-icon>Before
-                </label>
-                <label>
-                    <input id="addEmojiAfter" type="checkbox" checked="{{addEmojiAfter}}">
+                </paper-checkbox>
+                <paper-checkbox id="addEmojiAfter" checked="{{addEmojiAfter}}">
                     <iron-icon icon='myicons:tag-faces'></iron-icon>After
-                </label>
+                </paper-checkbox>
             </div>
+
             <div class='group'>
                 <paper-icon-button id="rotate45" icon="myicons:rotate-right">Rotate</paper-icon-button>
                 <paper-icon-button id="load" icon="myicons:file-upload">Load</paper-icon-button>

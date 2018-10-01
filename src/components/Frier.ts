@@ -9,8 +9,10 @@ import '@polymer/app-layout/app-header-layout/app-header-layout';
 import '@polymer/app-layout/app-scroll-effects/app-scroll-effects';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/paper-slider/paper-slider';
 import '@polymer/iron-icons/iron-icons';
+
 
 import { getTemplate } from './lib/getTemplate';
 import * as view from './Frier.template.html';
