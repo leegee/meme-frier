@@ -1,7 +1,21 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
+import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings';
 import { } from '@polymer/polymer/lib/elements/dom-repeat';
+
+import '@polymer/app-layout/app-drawer/app-drawer';
+import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
+import '@polymer/app-layout/app-header/app-header';
+import '@polymer/app-layout/app-header-layout/app-header-layout';
+import '@polymer/app-layout/app-scroll-effects/app-scroll-effects';
+import '@polymer/app-layout/app-toolbar/app-toolbar';
+import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/paper-slider/paper-slider';
+import '@polymer/iron-icons/iron-icons';
+
 import { getTemplate } from './lib/getTemplate';
 import * as view from './Frier.template.html';
+
+setPassiveTouchGestures(true);
 
 export class MemeFrier extends PolymerElement {
     src!: string;

@@ -8,8 +8,9 @@
     <script src="webcomponentjs/webcomponents-lite.js"></script>
     <script src="webcomponentjs/webcomponents-loader.js"></script>
     <style>
-        html, body {
-            background:#555;
+        html,
+        body {
+            background: #555;
             text-align: center;
             color: white;
             font-family: sans-serif;
@@ -18,17 +19,24 @@
             padding: 0;
         }
 
+        app-toolbar {
+            /* Toolbar is the main header, so give it some color */
+            background-color: #1E88E5;
+            font-family: 'Roboto', Helvetica, sans-serif;
+            color: white;
+            --app-toolbar-font-size: 24px;
+        }
+
         meme-frier {
             padding: 1em;
             min-width: 100%;
             min-height: 100%;
-            background:#777;
+            background: #777;
         }
     </style>
 </head>
 
 <body>
-    <h1>Meme Frier</h1>
     <meme-frier src='./static/rainbow.jpg'></meme-frier>
 </body>
 
