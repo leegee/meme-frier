@@ -19,11 +19,12 @@
     "@polymer/iron-flex-layout": "^3.0.1",
     "@polymer/iron-icons": "^3.0.1",
     "@polymer/iron-iconset-svg": "^3.0.1",
+    "@polymer/paper-checkbox": "^3.1.0",
+    "@polymer/paper-dropdown-menu": "^3.0.1",
     "@polymer/paper-icon-button": "^3.0.1",
     "@polymer/paper-slider": "^3.0.1",
     "@polymer/polymer": "^3.0.5",
-    "@webcomponents/webcomponentsjs": "1.0.14",
-    "paper-checkbox": "^0.10.0"
+    "@webcomponents/webcomponentsjs": "1.0.14"
   },
   "devDependencies": {
     "@polymer/iron-component-page": "^3.0.0-pre.20",

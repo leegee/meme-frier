@@ -12,7 +12,9 @@ import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/paper-slider/paper-slider';
 import '@polymer/iron-icons/iron-icons';
-
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
+import '@polymer/paper-item/paper-item';
+import '@polymer/paper-listbox/paper-listbox';
 
 import { getTemplate } from './lib/getTemplate';
 import * as view from './Frier.template.html';
