@@ -1,6 +1,7 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings';
 import { } from '@polymer/polymer/lib/elements/dom-repeat';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 import '@polymer/app-layout/app-drawer/app-drawer';
 import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
@@ -14,7 +15,7 @@ import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/paper-slider/paper-slider';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import { PaperItemElement } from '@polymer/paper-item/paper-item';
+import '@polymer/paper-item/paper-item';
 import '@polymer/paper-listbox/paper-listbox';
 
 import { getTemplate } from './lib/getTemplate';
@@ -67,12 +68,19 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        // TODO If not narrow
-        this.$.meme.addEventListener("tap", (e: Event) => {
-            (this.$.chooseFile as HTMLElement).click();
+        afterNextRender(this, () => {
+            // If not narrow, touch opens image
+            if ((this.$.drawer as AppDrawerElement).persistent) {
+                this.$.meme.addEventListener("tap", (e: Event) => {
+                    (this.$.chooseFile as HTMLElement).click();
+                });
+            } else {
+                // If narrow, touch opens drawer
+                this.$.meme.addEventListener("tap", (e: Event) => {
+                    (this.$.drawer as AppDrawerElement).open();
+                });
+            }
         });
-        // TODO If narrow, touch meme opens menu.
-        // TODO add container event to this.closeDrawer(); after control used
 
         this.$.drawer.addEventListener('tap', () => {
             if (!(this.$.drawer as AppDrawerElement).persistent) {
@@ -139,10 +147,6 @@ export class MemeFrier extends PolymerElement {
                 }
             }
         }
-    }
-
-    closeDrawer() {
-        (this.$.drawer as AppDrawerElement).close();
     }
 }
 
