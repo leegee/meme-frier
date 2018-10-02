@@ -38,7 +38,7 @@
     app-drawer {
         background: white;
         color: black;
-        --app-drawer-scrim-background: #00000033;
+        --app-drawer-scrim-background:gray;
         --app-drawer-content-container: {
             box-shadow: 1pt 0 2pt 1pt rgba(0,0,0,0.18);
         }
@@ -101,9 +101,9 @@
     </svg>
 </iron-iconset-svg>
 
-<app-drawer-layout fullbleed="" narrow="{{narrow}}">
-    <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <app-toolbar>Menu</app-toolbar>
+<app-drawer-layout fullbleed narrow="{{narrow}}">
+    <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" style='width:50%'>
+        <app-toolbar>Meme Deep Frier</app-toolbar>
 
         <div id="controls" class="group">
             <label>Saturation</label>
@@ -135,7 +135,8 @@
                 <!-- <select id="globalCompositeOperations" disabled=[[useOverlay]]>
                     <option value=''>None</option>
                 </select> -->
-                <paper-dropdown-menu label="Filter" id="globalCompositeOperations">
+                <paper-dropdown-menu label="Filter" id="globalCompositeOperations" selected="{{globalCompositeOperation}}"
+                    attr-for-selected="value">
                     <paper-listbox slot="dropdown-content" selected="0">
                         <paper-item>None</paper-item>
                         <template is="dom-repeat" items="{{globalCompositeOperations}}">
@@ -161,13 +162,6 @@
             </div>
         </div>
     </app-drawer>
-
-    <!-- <app-header slot="header" condenses="" reveals="" effects="waterfall">
-            <app-toolbar> -->
-    <!-- <paper-icon-button class='menu-button' icon="myicons:menu" drawer-toggle></paper-icon-button> -->
-    <!-- <div main-title="">Meme Deep Frier</div>
-            </app-toolbar>
-        </app-header> -->
 
     <fried-meme id="meme" src=[[src]] saturate={{saturation}} contrast={{contrast}} brightness={{brightness}}
         hue-rotate={{hueRotate}} scale={{scale}} jpeg-quality={{jpegQuality}} total-jpegs={{totalJpegs}} use-overlay={{useOverlay}}

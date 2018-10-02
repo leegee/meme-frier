@@ -68,9 +68,11 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        this.$.drawer.addEventListener('tap', () => {
+        this.$.drawer.addEventListener('tap', (e: Event) => {
             if (!(this.$.drawer as AppDrawerElement).persistent) {
-                (this.$.drawer as AppDrawerElement).close();
+                if ((e.target as HTMLElement).id !== 'globalCompositeOperations') {
+                    (this.$.drawer as AppDrawerElement).close();
+                }
             }
         });
 
