@@ -126,6 +126,18 @@ export class FriedMeme extends PolymerElement {
     imageLoaded() {
         this.loaded = true;
         this.working = false;
+        (this.$.srcimg as HTMLElement).style.rotate = '0deg';
+
+        delete (this.$.srcimg as HTMLImageElement).width;
+        delete (this.$.srcimg as HTMLImageElement).height;
+        delete (this.$.srcimg as HTMLElement).style.width;
+        delete (this.$.srcimg as HTMLElement).style.height;
+    
+        this.img = this.$.srcimg as HTMLImageElement;
+        this.img.onload = null;
+        this.originalImg = new Image();
+        this.originalImg.src = this.img.src;
+
         this._processChangedProperties();
     }
 
@@ -140,16 +152,6 @@ export class FriedMeme extends PolymerElement {
         document.body.style.cursor = 'wait';
         this.working = true;
 
-        delete (this.$.srcimg as HTMLImageElement).width;
-        delete (this.$.srcimg as HTMLImageElement).height;
-        delete (this.$.srcimg as HTMLElement).style.width;
-        delete (this.$.srcimg as HTMLElement).style.height;
-    
-        this.img = this.$.srcimg as HTMLImageElement;
-        this.img.onload = null;
-        this.originalImg = new Image();
-        this.originalImg.src = this.img.src;
-    
         this.canvas = document.createElement('canvas');
     
         // What size to opeate upon...?
@@ -425,32 +427,12 @@ export class FriedMeme extends PolymerElement {
         (this.$.srcimg as HTMLElement).style.width = height;
         (this.$.srcimg as HTMLElement).style.height = width;
         (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
-        // (this.$.srcimg as HTMLElement).dataset.degrees = deg.toString();
-        // const canvas = document.createElement('canvas');
-        // if (deg === 180) {
-        //     canvas.width = this.height;
-        //     canvas.height = this.width;
-        // } else {
-        //     canvas.width = this.width;
-        //     canvas.height = this.height;
-        // }
-        // const ctx = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
-
-        // if (deg === 180) {
-        //     ctx.rotate(Math.PI);
-        // }
-        // ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
     }
 
     newImage(src: string) {
-        const img = new Image();
-        img.onload = () => {
-            // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
-            (this.$.srcimg as HTMLImageElement).width = img.width;
-            (this.$.srcimg as HTMLImageElement).height = img.height;
-            this.connectedCallback();
-        };
         this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
+        // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
+        this.connectedCallback();
     }
 
 }
