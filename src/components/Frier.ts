@@ -51,15 +51,6 @@ export class MemeFrier extends PolymerElement {
             });
         });
 
-        // this.globalCompositeOperations.forEach((i) => {
-        //     const option = document.createElement('paper-item') as PaperItemElement;
-        //     option.textContent = i;
-        //     option.value = i;
-        //     if (i === this.globalCompositeOperation) {
-        //         option.selected = true;
-        //     }
-        //     this.$.globalCompositeOperations.appendChild(option);
-        // });
         this.$.globalCompositeOperations.addEventListener("change", (e: Event) => {
             this.globalCompositeOperation = (e as any).path[0].value;
         });
