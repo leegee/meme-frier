@@ -27,7 +27,7 @@ export class MemeFrier extends PolymerElement {
     contrast = 4;
     brightness = 2;
     scale = 1;
-    jpegQuality = 0.9;
+    jpegQuality = 0.1;
     totalJpegs = 22;
     noise = 0.2;
     hueRotate = 0;
@@ -42,6 +42,10 @@ export class MemeFrier extends PolymerElement {
         return getTemplate(view);
     }
 
+    foo() {
+        console.log('foo')
+    }
+
     connectedCallback() {
         super.connectedCallback();
 
@@ -50,12 +54,6 @@ export class MemeFrier extends PolymerElement {
                 this[id] = (this.$[id] as HTMLInputElement).checked;
             });
         });
-
-        this.$.globalCompositeOperations.addEventListener("change", (e: Event) => {
-            this.globalCompositeOperation = (e as any).path[0].value;
-        });
-
-        this.globalCompositeOperationIndex = this.globalCompositeOperations.indexOf( this.globalCompositeOperation );
 
         this.$.rotate45.addEventListener("tap", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
@@ -69,9 +67,16 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
+        this.globalCompositeOperationIndex = this.globalCompositeOperations.indexOf(this.globalCompositeOperation);
+
+        this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
+            this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
+        });
+
         this.$.drawer.addEventListener('tap', (e: Event) => {
             if (!(this.$.drawer as AppDrawerElement).persistent) {
-                if ((e.target as HTMLElement).id !== 'globalCompositeOperations') {
+                console.log('tapped ', (e.target as HTMLElement).id);
+                if ((e.target as HTMLElement).id.toString() !== 'globalCompositeOperation') {
                     (this.$.drawer as AppDrawerElement).close();
                 }
             }
@@ -138,6 +143,7 @@ export class MemeFrier extends PolymerElement {
             noise: { type: Number, reflectToAttribute: true, notify: true },
             hueRotate: { type: Number, reflectToAttribute: true, notify: true },
             blurStdDeviation: { type: Number, reflectToAttribute: true, notify: true },
+
             globalCompositeOperation: { type: String, reflectToAttribute: true, notify: true },
             globalCompositeOperationIndex: { type: Number },
             globalCompositeOperations: {

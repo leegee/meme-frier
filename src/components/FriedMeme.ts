@@ -132,7 +132,7 @@ export class FriedMeme extends PolymerElement {
         delete (this.$.srcimg as HTMLImageElement).height;
         delete (this.$.srcimg as HTMLElement).style.width;
         delete (this.$.srcimg as HTMLElement).style.height;
-    
+
         this.img = this.$.srcimg as HTMLImageElement;
         this.img.onload = null;
         this.originalImg = new Image();
@@ -153,11 +153,11 @@ export class FriedMeme extends PolymerElement {
         this.working = true;
 
         this.canvas = document.createElement('canvas');
-    
+
         // What size to opeate upon...?
         this.width = this.canvas.width = this.img.width;
         this.height = this.canvas.height = this.img.height;
-    
+
         this.ctx = this.canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -189,7 +189,7 @@ export class FriedMeme extends PolymerElement {
             await this._fry(currentDip + 1);
         }
 
-        if (this.globalCompositeOperation.length) {
+        if (this.globalCompositeOperation && this.globalCompositeOperation.length) {
             this._overlay();
         }
 
@@ -278,7 +278,7 @@ export class FriedMeme extends PolymerElement {
             this._resize(this.width * this.scale, this.height * this.scale);
             this._resize(this.width, this.height);
         }
-        const quality = Math.max(0, this.jpegQuality + Math.log(this.jpegItteration) * 0.5);
+        const quality = Math.max(0, this.jpegQuality + Math.log(this.jpegItteration) * 0.15);
         console.log('quality', quality);
         await this._saveToImg(
             'image/jpeg',
@@ -393,6 +393,9 @@ export class FriedMeme extends PolymerElement {
         this.ctx.save();
         this.ctx.globalAlpha = this.noise;
 
+        const portrait = noiseCanvas.height > noiseCanvas.width;
+
+        // Perlin noise
         for (let size = 4; size <= noiseCanvas.width; size *= 2) {
             let x = Math.floor(Math.random() * noiseCanvas.width) - size;
             let y = Math.floor(Math.random() * noiseCanvas.height) - size;
