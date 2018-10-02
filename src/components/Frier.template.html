@@ -131,14 +131,8 @@
             <paper-slider label="Hue Rotate" value={{hueRotate}} min=-180 max=180 step=10></paper-slider>
 
             <div class='group'>
-                <!-- <label>Filter:</label> -->
-                <!-- <select id="globalCompositeOperations" disabled=[[useOverlay]]>
-                    <option value=''>None</option>
-                </select> -->
-                <paper-dropdown-menu label="Filter" id="globalCompositeOperations" selected="{{globalCompositeOperation}}"
-                    attr-for-selected="value">
-                    <paper-listbox slot="dropdown-content" selected="0">
-                        <paper-item>None</paper-item>
+                <paper-dropdown-menu label="Filter" id="globalCompositeOperations">
+                    <paper-listbox slot="dropdown-content" selected="[[globalCompositeOperationIndex]]">
                         <template is="dom-repeat" items="{{globalCompositeOperations}}">
                             <paper-item>{{item}}</paper-item>
                         </template>

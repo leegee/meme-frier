@@ -6,8 +6,6 @@ import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import '@polymer/app-layout/app-drawer/app-drawer';
 import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
 import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
-import '@polymer/app-layout/app-header/app-header';
-import '@polymer/app-layout/app-header-layout/app-header-layout';
 import '@polymer/app-layout/app-scroll-effects/app-scroll-effects';
 import '@polymer/app-layout/app-toolbar/app-toolbar';
 import '@polymer/paper-icon-button/paper-icon-button';
@@ -37,6 +35,7 @@ export class MemeFrier extends PolymerElement {
     addEmojiAfter = true;
     globalCompositeOperation = 'hard-light';
     globalCompositeOperations!: Array<string>;
+    globalCompositeOperationIndex!: number;
     blurStdDeviation = 0;
 
     static get template() {
@@ -55,6 +54,8 @@ export class MemeFrier extends PolymerElement {
         this.$.globalCompositeOperations.addEventListener("change", (e: Event) => {
             this.globalCompositeOperation = (e as any).path[0].value;
         });
+
+        this.globalCompositeOperationIndex = this.globalCompositeOperations.indexOf( this.globalCompositeOperation );
 
         this.$.rotate45.addEventListener("tap", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
@@ -138,6 +139,7 @@ export class MemeFrier extends PolymerElement {
             hueRotate: { type: Number, reflectToAttribute: true, notify: true },
             blurStdDeviation: { type: Number, reflectToAttribute: true, notify: true },
             globalCompositeOperation: { type: String, reflectToAttribute: true, notify: true },
+            globalCompositeOperationIndex: { type: Number },
             globalCompositeOperations: {
                 type: Array,
                 value() {
