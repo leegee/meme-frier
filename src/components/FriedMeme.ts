@@ -443,10 +443,14 @@ export class FriedMeme extends PolymerElement {
     }
 
     newImage(src: string) {
+        const img = new Image();
+        img.onload = () => {
+            // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
+            (this.$.srcimg as HTMLImageElement).width = img.width;
+            (this.$.srcimg as HTMLImageElement).height = img.height;
+            this.connectedCallback();
+        };
         this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
-        // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
-        (this.$.srcimg as HTMLElement).style.rotate = '0deg';
-        this.connectedCallback();
     }
 
 }
