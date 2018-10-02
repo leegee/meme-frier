@@ -68,25 +68,10 @@ export class MemeFrier extends PolymerElement {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        afterNextRender(this, () => {
-            // If not narrow, touch opens image
-            if ((this.$.drawer as AppDrawerElement).persistent) {
-                this.$.meme.addEventListener("tap", (e: Event) => {
-                    (this.$.chooseFile as HTMLElement).click();
-                });
-            } else {
-                // If narrow, touch opens drawer
-                this.$.meme.addEventListener("tap", (e: Event) => {
-                    (this.$.drawer as AppDrawerElement).open();
-                });
-            }
-        });
-
         this.$.drawer.addEventListener('tap', () => {
             if (!(this.$.drawer as AppDrawerElement).persistent) {
                 (this.$.drawer as AppDrawerElement).close();
             }
-            console.log('tap');
         });
 
         this.$.chooseFile.addEventListener("change", (e: Event) => {
@@ -99,25 +84,43 @@ export class MemeFrier extends PolymerElement {
             }
         }, false);
 
-        this.$.meme.addEventListener("dragover", (e) => {
-            e.preventDefault();
-        });
+        afterNextRender(this, () => {
+            // If not narrow
+            if ((this.$.drawer as AppDrawerElement).persistent) {
+                // touch opens image
+                this.$.meme.addEventListener("tap", (e: Event) => {
+                    (this.$.chooseFile as HTMLElement).click();
+                });
 
-        this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
-            console.log('drop', e);
-            console.log((e as DragEvent).dataTransfer.items[0]);
-            e.preventDefault();
-            if ((e as DragEvent).dataTransfer.items &&
-                (e as DragEvent).dataTransfer.items[0].kind === 'file'
-            ) {
-                const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
-                this.$.meme.dispatchEvent(
-                    new CustomEvent('new-image', {
-                        detail: URL.createObjectURL(file)
-                    })
-                );
+                // Drag and drop for non-narrow
+                this.$.meme.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+
+                this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
+                    console.log('drop', e);
+                    console.log((e as DragEvent).dataTransfer.items[0]);
+                    e.preventDefault();
+                    if ((e as DragEvent).dataTransfer.items &&
+                        (e as DragEvent).dataTransfer.items[0].kind === 'file'
+                    ) {
+                        const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
+                        this.$.meme.dispatchEvent(
+                            new CustomEvent('new-image', {
+                                detail: URL.createObjectURL(file)
+                            })
+                        );
+                    }
+                }, false);
             }
-        }, false);
+
+            else {
+                // If narrow, touch opens drawer
+                this.$.meme.addEventListener("tap", (e: Event) => {
+                    (this.$.drawer as AppDrawerElement).open();
+                });
+            }
+        });
     }
 
     static get properties() {
