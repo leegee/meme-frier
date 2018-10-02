@@ -7,6 +7,12 @@
         --app-secondary-color: black;
     }
 
+    .menu-button {
+        position: fixed;
+        top: 0; 
+        left: 0;
+    }
+
     .group {
         float: left;
         margin-right: 1em;
@@ -20,8 +26,8 @@
     }
 
     #meme {
-        width: 100%;
-        height: 100%;
+        /* width: 100%;
+        height: 90%; */
         object-fit: contain;
     }
 
@@ -156,19 +162,17 @@
         </div>
     </app-drawer>
 
-    <app-header-layout has-scrolling-region="">
 
-        <app-header slot="header" condenses="" reveals="" effects="waterfall">
-            <app-toolbar>
-                <paper-icon-button icon="myicons:menu" drawer-toggle=""></paper-icon-button>
-                <div main-title="">Meme Deep Frier</div>
+    <!-- <app-header slot="header" condenses="" reveals="" effects="waterfall">
+            <app-toolbar> -->
+    <paper-icon-button class='menu-button' icon="myicons:menu" drawer-toggle=""></paper-icon-button>
+    <!-- <div main-title="">Meme Deep Frier</div>
             </app-toolbar>
-        </app-header>
+        </app-header> -->
 
-        <fried-meme id="meme" src=[[src]] saturate={{saturation}} contrast={{contrast}} brightness={{brightness}}
-            hue-rotate={{hueRotate}} scale={{scale}} jpeg-quality={{jpegQuality}} total-jpegs={{totalJpegs}}
-            use-overlay={{useOverlay}} add-emoji-before={{addEmojiBefore}} add-emoji-after={{addEmojiAfter}} noise={{noise}}
-            global-composite-operation={{globalCompositeOperation}} blur-std-deviation={{blurStdDeviation}}></fried-meme>
+    <fried-meme id="meme" src=[[src]] saturate={{saturation}} contrast={{contrast}} brightness={{brightness}}
+        hue-rotate={{hueRotate}} scale={{scale}} jpeg-quality={{jpegQuality}} total-jpegs={{totalJpegs}} use-overlay={{useOverlay}}
+        add-emoji-before={{addEmojiBefore}} add-emoji-after={{addEmojiAfter}} noise={{noise}}
+        global-composite-operation={{globalCompositeOperation}} blur-std-deviation={{blurStdDeviation}}></fried-meme>
 
-    </app-header-layout>
 </app-drawer-layout>

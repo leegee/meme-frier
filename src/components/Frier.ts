@@ -3,6 +3,7 @@ import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings';
 import { } from '@polymer/polymer/lib/elements/dom-repeat';
 
 import '@polymer/app-layout/app-drawer/app-drawer';
+import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
 import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
 import '@polymer/app-layout/app-header/app-header';
 import '@polymer/app-layout/app-header-layout/app-header-layout';
@@ -13,7 +14,7 @@ import '@polymer/paper-checkbox/paper-checkbox';
 import '@polymer/paper-slider/paper-slider';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import {PaperItemElement} from '@polymer/paper-item/paper-item';
+import { PaperItemElement } from '@polymer/paper-item/paper-item';
 import '@polymer/paper-listbox/paper-listbox';
 
 import { getTemplate } from './lib/getTemplate';
@@ -41,7 +42,6 @@ export class MemeFrier extends PolymerElement {
         return getTemplate(view);
     }
 
-
     connectedCallback() {
         super.connectedCallback();
 
@@ -64,20 +64,30 @@ export class MemeFrier extends PolymerElement {
             this.globalCompositeOperation = (e as any).path[0].value;
         });
 
-        this.$.rotate45.addEventListener("click", (e: Event) => {
+        this.$.rotate45.addEventListener("tap", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
         });
 
-        this.$.save.addEventListener("click", (e: Event) => {
+        this.$.save.addEventListener("tap", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("save-image"));
         });
 
-        this.$.load.addEventListener("click", (e: Event) => {
+        this.$.load.addEventListener("tap", (e: Event) => {
             (this.$.chooseFile as HTMLElement).click();
         });
 
-        this.$.meme.addEventListener("click", (e: Event) => {
+        // TODO If not narrow
+        this.$.meme.addEventListener("tap", (e: Event) => {
             (this.$.chooseFile as HTMLElement).click();
+        });
+        // TODO If narrow, touch meme opens menu.
+        // TODO add container event to this.closeDrawer(); after control used
+
+        this.$.drawer.addEventListener('tap', () => {
+            if (!(this.$.drawer as AppDrawerElement).persistent) {
+                (this.$.drawer as AppDrawerElement).close();
+            }
+            console.log('tap');
         });
 
         this.$.chooseFile.addEventListener("change", (e: Event) => {
@@ -138,6 +148,10 @@ export class MemeFrier extends PolymerElement {
                 }
             }
         }
+    }
+
+    closeDrawer() {
+        (this.$.drawer as AppDrawerElement).close();
     }
 }
 
