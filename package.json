@@ -1,22 +1,23 @@
 {
   "name": "meme-frier",
+  "description": "MemeMe Meme Deep Frier",
   "version": "0.2.0",
   "author": {
     "name": "Lee Goddard",
     "email": "cv@LeeGoddard.net",
     "url": "http://LeeGoddard.net"
   },
-  "main": "build/index.js",
+  "main": "src/index.html",
   "license": "MIT",
   "flat": true,
   "scripts": {
     "dev": "webpack-dev-server --config ./webpack.dev.conf.js",
     "start": "webpack-dev-server --open --config ./webpack.dev.conf.js",
-    "build": "webpack --config ./webpack.prod.conf.js"
+    "build": "webpack --config ./webpack.prod.conf.js",
+    "test-dist": "node -e \"require('connect')().use(require('serve-static')(__dirname+'/dist')).listen(9090, () => { console.log('Server running on http://localhost:9090 ...'); });\""
   },
   "dependencies": {
     "@polymer/app-layout": "^3.0.0",
-    "@polymer/iron-flex-layout": "^3.0.1",
     "@polymer/iron-icons": "^3.0.1",
     "@polymer/iron-iconset-svg": "^3.0.1",
     "@polymer/paper-checkbox": "^3.1.0",
@@ -33,9 +34,11 @@
   "devDependencies": {
     "@polymer/iron-component-page": "^3.0.0-pre.20",
     "clean-webpack-plugin": "0.1.17",
+    "connect": "^3.6.6",
     "copy-webpack-plugin": "4.1.0",
     "html-loader": "0.5.1",
     "html-webpack-plugin": "2.30.1",
+    "serve-static": "^1.13.2",
     "ts-loader": "2.3.7",
     "typescript": "^3.0.3",
     "webpack": "3.6.0",
