@@ -26,8 +26,6 @@
     }
 
     #meme {
-        /* width: 100%;
-        height: 90%; */
         object-fit: contain;
     }
 
@@ -57,14 +55,10 @@
         display: none;
     }
 
-    app-header {
-        color: #fff;
-        background-color: var(--app-primary-color);
+    app-drawer-layout:narrow {
+        width:50%;
     }
 
-    app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
-    }
 
 </style>
 
@@ -102,7 +96,7 @@
 </iron-iconset-svg>
 
 <app-drawer-layout fullbleed narrow="{{narrow}}">
-    <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" style='width:50%'>
+    <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
         <app-toolbar>Meme Deep Frier</app-toolbar>
 
         <div id="controls" class="group">
