@@ -71,6 +71,7 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
+            (this.$.drawer as AppDrawerElement).close();
         });
 
         this.$.drawer.addEventListener('tap', (e: Event) => {
@@ -150,11 +151,9 @@ export class MemeFrier extends PolymerElement {
                 type: Array,
                 value() {
                     return [
-                        'hard-light', 'soft-light', 'overlay',
-                        'source-over', 'source-in', 'source-out', 'source-atop',
-                        'destination-over', 'destination-in', 'destination-out', 'destination-atop',
-                        'lighter', 'copy', 'xor', 'multiply', 'screen', 'darken', 'lighten',
-                        'color-dodge', 'color-burn', 'difference', 'exclusion',
+                        '', 'hard-light', 'soft-light', 'overlay',
+                        'lighter',  'multiply', 'screen', 'darken', 'lighten',
+                        'color-dodge', 'color-burn', 
                         'hue', 'saturation', 'color', 'luminosity'
                     ];
                 }

@@ -327,7 +327,7 @@ export class FriedMeme extends PolymerElement {
         const maxSize = this.canvas.height / 4;
         const textSize = Math.floor(Math.random() * (maxSize - minSize)) + minSize;
 
-        this.ctx.globalAlpha = (Math.random() + 0.2) / 0.8;
+        this.ctx.globalAlpha = (Math.random() + 0.2) / 0.7;
         this.ctx.font = `${textSize}px Archivo Black`;
 
         const emoji = this.emojis[Math.floor(Math.random() * this.emojis.length)];
