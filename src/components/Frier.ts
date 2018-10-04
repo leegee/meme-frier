@@ -71,7 +71,9 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
-            // (this.$.drawer as AppDrawerElement).close();
+            if (! (this.$.drawer as AppDrawerElement).persistent) {
+                (this.$.drawer as AppDrawerElement).close();
+            }
         });
 
         this.$.drawer.addEventListener('tap', (e: Event) => {
