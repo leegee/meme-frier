@@ -26,7 +26,7 @@ export class MemeFrier extends PolymerElement {
     saturation = 2;
     contrast = 4;
     brightness = 2;
-    scale = 1;
+    scale = 0.5;
     jpegQuality = 0.1;
     totalJpegs = 22;
     noise = 0.2;

@@ -270,16 +270,24 @@ export class FriedMeme extends PolymerElement {
         );
         this.canvas = canvas;
         this.ctx = ctx;
+        console.log('made size ', this.canvas.width, this.canvas.height);
     }
 
     private async _lossySave() {
         // Make even worse:
         if (this.scale !== 1) {
-            this._resize(this.width * this.scale, this.height * this.scale);
-            this._resize(this.width, this.height);
+            const width = this.width * this.scale;
+            const height = this.height * this.scale;
+            if (width > 50 && height > 50) {
+                this._resize(width, height);
+                this._resize(this.width, this.height);
+                console.log('rescale in _lossySave');
+            } else {
+                console.log('no rescale, ', width, height);
+            }
         }
         const quality = Math.max(0, this.jpegQuality + Math.log(this.totalJpegs - this.jpegItteration) * 0.15);
-        console.log('quality', quality);
+        console.log('scale/quality %s / %s', this.scale, quality);
         await this._saveToImg(
             'image/jpeg',
             quality
@@ -310,6 +318,11 @@ export class FriedMeme extends PolymerElement {
             const previousOnError = this.img.onerror;
             this.img.onerror = reject;
             this.img.onload = () => {
+                /* // begin debug
+                const el = document.createElement('img');
+                (el as HTMLImageElement).src = url;
+                document.body.appendChild(el);
+                // end debug */
                 console.log('loaded jpeg _replaceImgWithJpegBlob');
                 URL.revokeObjectURL(url);
                 this.ctx.drawImage(this.img, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
