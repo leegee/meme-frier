@@ -71,7 +71,7 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
-            (this.$.drawer as AppDrawerElement).close();
+            // (this.$.drawer as AppDrawerElement).close();
         });
 
         this.$.drawer.addEventListener('tap', (e: Event) => {
@@ -96,7 +96,7 @@ export class MemeFrier extends PolymerElement {
         afterNextRender(this, () => {
             // If not narrow
             if ((this.$.drawer as AppDrawerElement).persistent) {
-                // touch opens image
+                console.info('Not narrow, so touch opens image');
                 this.$.meme.addEventListener("tap", (e: Event) => {
                     (this.$.chooseFile as HTMLElement).click();
                 });
@@ -124,7 +124,7 @@ export class MemeFrier extends PolymerElement {
             }
 
             else {
-                // If narrow, touch opens drawer
+                console.info('Is narrow, touch opens drawer');
                 this.$.meme.addEventListener("tap", (e: Event) => {
                     (this.$.drawer as AppDrawerElement).open();
                 });
