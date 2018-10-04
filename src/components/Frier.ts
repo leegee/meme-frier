@@ -152,8 +152,8 @@ export class MemeFrier extends PolymerElement {
                 value() {
                     return [
                         '', 'hard-light', 'soft-light', 'overlay',
-                        'lighter',  'multiply', 'screen', 'darken', 'lighten',
-                        'color-dodge', 'color-burn', 
+                        'lighter', 'multiply', 'screen', 'darken', 'lighten',
+                        'color-dodge', 'color-burn',
                         'hue', 'saturation', 'color', 'luminosity'
                     ];
                 }

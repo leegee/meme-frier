@@ -278,7 +278,7 @@ export class FriedMeme extends PolymerElement {
             this._resize(this.width * this.scale, this.height * this.scale);
             this._resize(this.width, this.height);
         }
-        const quality = Math.max(0, this.jpegQuality + Math.log(this.jpegItteration) * 0.15);
+        const quality = Math.max(0, this.jpegQuality + Math.log(this.totalJpegs - this.jpegItteration) * 0.15);
         console.log('quality', quality);
         await this._saveToImg(
             'image/jpeg',
@@ -310,6 +310,7 @@ export class FriedMeme extends PolymerElement {
             const previousOnError = this.img.onerror;
             this.img.onerror = reject;
             this.img.onload = () => {
+                console.log('loaded jpeg _replaceImgWithJpegBlob');
                 URL.revokeObjectURL(url);
                 this.ctx.drawImage(this.img, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
                 this.img.onerror = previousOnError;
@@ -393,9 +394,7 @@ export class FriedMeme extends PolymerElement {
         this.ctx.save();
         this.ctx.globalAlpha = this.noise;
 
-        const portrait = noiseCanvas.height > noiseCanvas.width;
-
-        // Perlin noise
+        // Roughly Perlin noise
         for (let size = 4; size <= noiseCanvas.width; size *= 2) {
             let x = Math.floor(Math.random() * noiseCanvas.width) - size;
             let y = Math.floor(Math.random() * noiseCanvas.height) - size;
