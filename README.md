@@ -1,14 +1,9 @@
+cou alny worse
 # meme-frier
 
 A meme deep frier
 
-## Run in development mode
-
 `npm run dev`
-
-## Build for production
-
-`npm run build`
 
 ## Iconset generator
 
