@@ -6,7 +6,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
-  mode: 'development',
   entry: {
     app: [
       'webpack-dev-server/client?http://localhost:8080',
