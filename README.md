@@ -1,4 +1,3 @@
-cou alny worse
 # meme-frier
 
 A meme deep frier
