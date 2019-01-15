@@ -163,4 +163,3 @@ export class MemeFrier extends PolymerElement {
         }
     }
 }
-

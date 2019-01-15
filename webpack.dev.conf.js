@@ -32,7 +32,7 @@ module.exports = {
       //   use: 'raw-loader'
       // },
       {
-        test: /\.ts?$/,
+        test: /\.[jt]s?$/,
         use: 'ts-loader',
         exclude: /node_modules/
       }
