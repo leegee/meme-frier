@@ -2,6 +2,8 @@
     :host { 
         box-sizing: border-box;
         display: block;
+        width: 100%;
+        height: 100%;
         line-height: 2em;
         --app-primary-color: #4285f4;
         --app-secondary-color: black;
@@ -27,10 +29,21 @@
 
     #meme {
         object-fit: contain;
+        width: 100%;
+        height: 100%;
+        background: rgba(0.5, 0.5, 0.5, 0.5);
     }
 
     #chooseFile {
         display: none;
+    }
+
+    app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+    }
+
+    app-drawer-layout:narrow {
+        width:50%;
     }
 
     app-drawer {
@@ -51,15 +64,16 @@
         margin: 1em;
     }
 
-    app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
+    x-canvas {
+        position: absolute;
+        left: 50%;
+        top: 50%;
     }
 
-    app-drawer-layout:narrow {
-        width:50%;
+    #c {
+        border-radius: 50%;
+        pointer-events: none;
     }
-
-
 </style>
 
 <input type="file" id="chooseFile">
