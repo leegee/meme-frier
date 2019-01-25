@@ -1,87 +1,46 @@
 /**
  * Also listens for these custom events:
- * 
+ *
  * * `new-image` where `Event.detail` is a Base64-encoded data URL for the image.
- 
  * * `save-image`
- * 
  * * `rotate45`
  */
-import { CanvasRenderingContext2DExtended } from './lib/CanvasRenderingContext2DExtended.interface';
-import { PolymerElement } from '@polymer/polymer/polymer-element';
-import { getTemplate } from './lib/getTemplate';
-import * as view from './FriedMeme.template.html';
+import { PolymerElement } from "@polymer/polymer/polymer-element";
+import * as view from "./FriedMeme.template.html";
+import { CanvasRenderingContext2DExtended } from "./lib/CanvasRenderingContext2DExtended.interface";
+import { getTemplate } from "./lib/getTemplate";
 
 export class FriedMeme extends PolymerElement {
-  public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
-
-  protected loaded = false;
-  protected working = false;
-
-  private img!: HTMLImageElement;
-  private lastBlob!: Blob;
-  private canvasBg!: HTMLCanvasElement;
-  private canvasC!: HTMLCanvasElement;
-  private ctx!: CanvasRenderingContext2DExtended;
-  private originalImg!: HTMLImageElement;
-  private width!: number;
-  private height!: number;
-  private jpegItteration!: number;
-
-  private blurFilterId!: string;
-  private convFilterId!: string;
-  public convFilterKernel!: string;
-  private numberOfDips = 1;
-  private totalJpegs = 1;
-  private jpegQuality = 0.01; // 0 - 1
-  private scale = 1;
-  private blurStdDeviation = 0; // 0 - 1
-  private brightness = 1; // 1 is default
-  private saturate = 2; // 1 is default
-  private contrast = 4; // 1 is default
-  private hueRotate = 0; // 0 (deg) is default
-  private useSharpness = true;
-  private noise = 0.1; // 0-1
-  private globalCompositeOperation = 'hard-light';
-  private globalCompositeAlpha = 0.5;
-  private addEmojiBefore = false;
-  private addEmojiAfter = true;
-
-  constructor(){
-    super();
-    window.addEventListener("mousemove", this.distortion);
-    window.addEventListener("touchmove", this.distortion);
-  }
 
   static get properties() {
       return {
-          src: { type: String, reflectToAttribute: true }, // 1 is default
-          saturate: { type: Number }, // 1 is default
-          contrast: { type: Number }, // 1 is default
-          brightness: { type: Number }, // 1 is default
-          hueRotate: { type: Number },
-          numberOfDips: { type: Number },
-          totalJpegs: { type: Number },
-          jpegQuality: { type: Number }, // 0 - 1
-          scale: { type: Number },
-          blurStdDeviation: { type: Number }, // 0 - 1
-          useSharpness: { type: Boolean },
-          noise: { type: Number }, // 0-1
-          globalCompositeOperation: { type: String },
-          globalCompositeAlpha: { type: Number },
-          addEmojiBefore: { type: Boolean },
           addEmojiAfter: { type: Boolean },
-          blurFilterId: { type: String, value: 'blurFilterId' },
-          convFilterId: { type: String, value: 'convFilterId' },
+          addEmojiBefore: { type: Boolean },
+          blurFilterId: { type: String, value: "blurFilterId" },
+          blurStdDeviation: { type: Number }, // 0 - 1
+          brightness: { type: Number }, // 1 is default
+          contrast: { type: Number }, // 1 is default
+          convFilterId: { type: String, value: "convFilterId" },
           convFilterKernel: {
-              type: String,
-              value: `
-                    0  -1   0
-                  -1   5  -1
-                    0  -1   0
-              `
-          }
-      }
+            type: String,
+            value: `
+                  0  -1   0
+                -1   5  -1
+                  0  -1   0
+            `,
+          },
+          globalCompositeAlpha: { type: Number },
+          globalCompositeOperation: { type: String },
+          hueRotate: { type: Number },
+          jpegQuality: { type: Number }, // 0 - 1
+          noise: { type: Number }, // 0-1
+          numberOfDips: { type: Number },
+          saturate: { type: Number }, // 1 is default
+          scale: { type: Number },
+          src: { type: String, reflectToAttribute: true }, // 1 is default
+          totalJpegs: { type: Number },
+          useSharpness: { type: Boolean },
+      };
   }
 
   static get template() {
@@ -93,47 +52,89 @@ export class FriedMeme extends PolymerElement {
 
   static get observers() {
       return [
-          '_propertiesUpdated('
-          + Object.keys(FriedMeme.properties).join(',')
-          + ')'
-      ]
+          "_propertiesUpdated("
+          + Object.keys(FriedMeme.properties).join(",")
+          + ")",
+      ];
   }
 
-  ready() {
+  public emojis = ["🤑", "😭", "😨", "😧", "😱", "😫", "😩", "😃", "😄", "😭", "😆", "😢", "😭"];
+  public convFilterKernel!: string;
+
+  protected loaded = false;
+  protected working = false;
+
+  private img!: HTMLImageElement;
+  private lastBlob!: Blob;
+  private canvasBg!: HTMLCanvasElement;
+  private canvasC!: HTMLCanvasElement;
+  private ctx!: CanvasRenderingContext2DExtended;
+  private ctxC!: CanvasRenderingContext2DExtended;
+  private originalImg!: HTMLImageElement;
+  private width!: number;
+  private height!: number;
+  private jpegItteration!: number;
+  private lastFisheyeInputEvent!: MouseEvent | TouchEvent;
+
+  private blurFilterId!: string;
+  private convFilterId!: string;
+  private numberOfDips = 1;
+  private totalJpegs = 1;
+  private jpegQuality = 0.01; // 0 - 1
+  private scale = 1;
+  private blurStdDeviation = 0; // 0 - 1
+  private brightness = 1; // 1 is default
+  private saturate = 2; // 1 is default
+  private contrast = 4; // 1 is default
+  private hueRotate = 0; // 0 (deg) is default
+  private useSharpness = true;
+  private noise = 0.1; // 0-1
+  private globalCompositeOperation = "hard-light";
+  private globalCompositeAlpha = 0.5;
+  private addEmojiBefore = false;
+  private addEmojiAfter = true;
+
+  constructor() {
+    super();
+    window.addEventListener("mousemove", (e) => this.distortionFromEvent(e));
+    window.addEventListener("touchmove", (e) => this.distortionFromEvent(e));
+  }
+
+  public ready() {
       super.ready();
-      this.addEventListener('rotate45', () => {
+      this.addEventListener("rotate45", () => {
           this.rotate45();
       });
 
-      this.addEventListener('save-image', () => {
+      this.addEventListener("save-image", () => {
           this.saveImage();
       });
 
-      this.addEventListener('new-image', (e: CustomEvent | Event) => {
+      this.addEventListener("new-image", (e: CustomEvent | Event) => {
           this.newImage((e as CustomEvent).detail);
       });
   }
 
-  _propertiesUpdated() {
-      console.debug('Enter _propertiesUpdated');
+  public _propertiesUpdated() {
+      console.debug("Enter _propertiesUpdated");
       if (this.originalImg) {
-          console.debug('Set srcimg to ', this.originalImg.src);
+          console.debug("Set srcimg to ", this.originalImg.src);
           (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
           this.connectedCallback();
       }
   }
 
-  connectedCallback() {
+  public connectedCallback() {
       super.connectedCallback();
       (this.$.srcimg as HTMLImageElement).onload = () => {
           this.imageLoaded();
       };
   }
 
-  imageLoaded() {
+  public imageLoaded() {
       this.loaded = true;
       this.working = false;
-      (this.$.srcimg as HTMLElement).style.rotate = '0deg';
+      (this.$.srcimg as HTMLElement).style.rotate = "0deg";
 
       delete (this.$.srcimg as HTMLImageElement).width;
       delete (this.$.srcimg as HTMLImageElement).height;
@@ -148,53 +149,163 @@ export class FriedMeme extends PolymerElement {
       this._processChangedProperties();
   }
 
+  public newImage(src: string) {
+      this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
+      // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
+      this.connectedCallback();
+  }
+
+  private distortionFromEvent(e: MouseEvent | TouchEvent) {
+    this.lastFisheyeInputEvent = e;
+    this._processChangedProperties();
+  }
+
+  private addFisheyeDistortion() {
+    if (!this.lastFisheyeInputEvent) {
+      return;
+    }
+
+    const e: MouseEvent | TouchEvent = this.lastFisheyeInputEvent;
+    const cx: number = ((e as TouchEvent).touches ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX);
+    const cy: number = ((e as TouchEvent).touches ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY);
+    const size = 200;
+    const zoom = 1;
+    this.canvasC.width = size;
+    this.canvasC.height = size;
+    this.canvasC.style.left = ((cx - size) / 2) + "px";
+    this.canvasC.style.top = ((cy - size) / 2) + "px";
+
+    this.ctxC.fillStyle = "#000";
+    this.ctxC.fillRect(0, 0, size, size);
+    this.ctxC.drawImage(
+        this.canvasBg,
+        cx - this.canvasBg.offsetLeft - .5 * size / zoom,
+        cy - this.canvasBg.offsetTop - .5 * size / zoom,
+        size / zoom,
+        size / zoom,
+        0,
+        0,
+        size,
+        size,
+    );
+
+    // const imgData = this.ctx.getImageData(0, 0, size, size),
+    const imgData = this.ctxC.getImageData(0, 0, size, size);
+    const pixels = imgData.data;
+    const h = size;
+    const w = size;
+
+    let index = 0;
+    const pixelsCopy: any[] = [];
+
+    for (let i = 0; i <= pixels.length; i += 4) {
+        pixelsCopy[index] = [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]];
+        index++;
+    }
+
+    const result = this.fisheye(pixelsCopy, w, h);
+
+    for (let i = 0; i < result.length; i++) {
+        index = 4 * i;
+        if (result[i] !== undefined) {
+            pixels[index + 0] = result[i][0];
+            pixels[index + 1] = result[i][1];
+            pixels[index + 2] = result[i][2];
+            pixels[index + 3] = result[i][3];
+        }
+    }
+
+    this.ctx.putImageData(imgData, 0, 0);
+  }
+
+  private fisheye(srcpixels, w, h) {
+    const dstpixels = srcpixels.slice();
+
+    for (let y = 0; y < h; y++) {
+      const ny = ((2 * y) / h) - 1;
+      const ny2 = ny * ny;
+
+      for (let x = 0; x < w; x++) {
+        const nx = ((2 * x) / w) - 1;
+        const nx2 = nx * nx;
+        const r = Math.sqrt(nx2 + ny2);
+
+        if (0.0 <= r && r <= 1.0) {
+          let nr = Math.sqrt(1.0 - r * r);
+          nr = (r + (1.0 - nr)) / 2.0;
+
+          if (nr <= 1.0) {
+            const theta: number = Math.atan2(ny, nx);
+            const nxn: number = nr * Math.cos(theta);
+            const nyn: number = nr * Math.sin(theta);
+            const x2: number = Math.round(((nxn + 1) * w) / 2);
+            const y2: number = Math.round(((nyn + 1) * h) / 2);
+            const srcpos: number = Math.round(y2 * w + x2);
+            if (srcpos >= 0 && srcpos < w * h) {
+              dstpixels[Math.round(y * w + x)] = srcpixels[srcpos];
+            }
+          }
+        }
+
+      } // next x
+    } // next y
+
+    return dstpixels;
+  }
+
   private async _processChangedProperties() {
-      console.debug('Enter _processChangedProperties');
+      console.debug("Enter _processChangedProperties");
 
       if (!this.loaded || this.working) {
-          console.debug('Bail from _processChangedProperties:: loaded=%s, running=%s', this.loaded, this.working);
+          console.debug("_processChangedProperties, bail-out: loaded=%s, working=%s", this.loaded, this.working);
           return;
       }
 
-      document.body.style.cursor = 'wait';
+      document.body.style.cursor = "wait";
+      const previousWorking = this.working;
+      console.debug("_processChangedProperties setting working to true");
       this.working = true;
 
-      this.canvasBg = document.createElement('canvas');
-      this.canvasC  = document.createElement('canvas');
+      this.canvasBg = document.createElement("canvas");
+      this.canvasC  = document.createElement("canvas");
 
       // What size to opeate upon...?
-      this.width = this.canvasBg.width = this.canvasC.width =this.img.width;
-      this.height = this.canvasBg.height = this.canvasC.height =this.img.height;
+      this.width = this.canvasBg.width = this.canvasC.width = this.img.width;
+      this.height = this.canvasBg.height = this.canvasC.height = this.img.height;
 
-      this.canvasC.style.marginLeft = this.canvasBg.style.marginLeft = -this.width/2 + 'px';  
-      this.canvasC.style.marginTop = this.canvasBg.style.marginTop = -this.height/2 + 'px';
-  
-      this.ctx = this.canvasBg.getContext('2d')! as CanvasRenderingContext2DExtended;
+      this.canvasC.style.marginLeft = -this.width / 2 + "px";
+      this.canvasC.style.marginTop = -this.height / 2 + "px";
+
+      this.ctxC = this.canvasC.getContext("2d")! as CanvasRenderingContext2DExtended;
+      this.ctx = this.canvasBg.getContext("2d")! as CanvasRenderingContext2DExtended;
       this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
       await this._fry();
-      console.debug('Leave _processChangedProperties');
+
+      this.working = previousWorking;
+      console.debug("Leave _processChangedProperties, set working to %s", this.working);
   }
 
   private async _fry(currentDip = 1) {
-      console.debug('Enter _fry');
-      this.working = true;
+      console.debug("Enter _fry");
 
       if (this.numberOfDips > 1) {
-          throw new Error('Only supporting one dip now');
+          throw new Error("_fry: only supporting one dip now");
       }
+
+      const previousWorking = this.working;
+      this.working = true;
 
       if (this.addEmojiBefore) {
           this._addEmoji();
       }
 
       await this._filterImage();
+      await this.addFisheyeDistortion();
 
       for (this.jpegItteration = 1; this.jpegItteration <= this.totalJpegs; this.jpegItteration++) {
           await this._lossySave();
       }
-
-      // this._messitMore();
 
       if (currentDip < this.numberOfDips) {
           await this._fry(currentDip + 1);
@@ -210,23 +321,23 @@ export class FriedMeme extends PolymerElement {
 
       await this._losslessSave();
 
-      document.body.style.cursor = 'default';
-      this.working = false;
-      console.debug('Leave _fry');
+      document.body.style.cursor = "default";
+      this.working = previousWorking;
+      console.debug("Leave _fry, working set to %s, this.working");
   }
 
   private async _filterImage() {
-      this.ctx.filter = ''
+      this.ctx.filter = ""
           + `saturate(${this.saturate}) `
-          + (this.useSharpness ? `url("#${this.convFilterId}") ` : '')
-          + `brightness(${this.brightness}) 
-              contrast(${this.contrast}) 
+          + (this.useSharpness ? `url("#${this.convFilterId}") ` : "")
+          + `brightness(${this.brightness})
+              contrast(${this.contrast})
               hue-rotate(${this.hueRotate}deg) `
-          + (this.blurStdDeviation > 0 ? `url("#${this.blurFilterId}") ` : '')
+          + (this.blurStdDeviation > 0 ? `url("#${this.blurFilterId}") ` : "")
           ;
 
-      console.info('filter =', this.ctx.filter);
-      console.info('globalCompositeOperation=', this.globalCompositeOperation);
+      console.info("filter =", this.ctx.filter);
+      console.info("globalCompositeOperation=", this.globalCompositeOperation);
 
       this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -234,10 +345,10 @@ export class FriedMeme extends PolymerElement {
           this.addNoise();
       }
 
-      const canvas2: HTMLCanvasElement = document.createElement('canvas');
+      const canvas2: HTMLCanvasElement = document.createElement("canvas");
       canvas2.width = this.width;
       canvas2.height = this.height;
-      const ctx2: CanvasRenderingContext2DExtended = canvas2.getContext('2d')! as CanvasRenderingContext2DExtended;
+      const ctx2: CanvasRenderingContext2DExtended = canvas2.getContext("2d")! as CanvasRenderingContext2DExtended;
       ctx2.filter = `url("#${this.convFilterId}")  `;
       ctx2.drawImage(this.canvasBg, 0, 0, this.width, this.height);
       this.canvasBg = canvas2;
@@ -245,8 +356,8 @@ export class FriedMeme extends PolymerElement {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
   private _overlay() {
-      const canvas: HTMLCanvasElement = document.createElement('canvas');
-      const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
+      const canvas: HTMLCanvasElement = document.createElement("canvas");
+      const ctx: CanvasRenderingContext2DExtended = canvas.getContext("2d")! as CanvasRenderingContext2DExtended;
       canvas.width = this.width;
       canvas.height = this.height;
       ctx.save();
@@ -267,12 +378,12 @@ export class FriedMeme extends PolymerElement {
   }
 
   private async _losslessSave() {
-      await this._saveToImg('image/png', 1);
+      await this._saveToImg("image/png", 1);
   }
 
   private _resize(width: number, height: number) {
-      let canvas: HTMLCanvasElement = document.createElement('canvas');
-      let ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
+      const canvas: HTMLCanvasElement = document.createElement("canvas");
+      const ctx: CanvasRenderingContext2DExtended = canvas.getContext("2d")! as CanvasRenderingContext2DExtended;
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(this.canvasBg,
@@ -281,7 +392,7 @@ export class FriedMeme extends PolymerElement {
       );
       this.canvasBg = canvas;
       this.ctx = ctx;
-      console.debug('made size ', this.canvasBg.width, this.canvasBg.height);
+      console.debug("made size ", this.canvasBg.width, this.canvasBg.height);
   }
 
   private async _lossySave() {
@@ -292,20 +403,20 @@ export class FriedMeme extends PolymerElement {
           if (width > 50 && height > 50) {
               this._resize(width, height);
               this._resize(this.width, this.height);
-              console.debug('rescale in _lossySave');
+              console.debug("rescale in _lossySave");
           } else {
-              console.debug('no rescale, ', width, height);
+              console.debug("no rescale, ", width, height);
           }
       }
       const quality = Math.max(0, this.jpegQuality + Math.log(this.totalJpegs - this.jpegItteration) * 0.15);
-      console.debug('scale/quality %s / %s', this.scale, quality);
+      console.debug("scale/quality %s / %s", this.scale, quality);
       await this._saveToImg(
-          'image/jpeg',
-          quality
+          "image/jpeg",
+          quality,
       );
   }
 
-  private _saveToImg(mimeType: string = 'image/jpeg', quality: number = this.jpegQuality) {
+  private _saveToImg(mimeType: string = "image/jpeg", quality: number = this.jpegQuality) {
       return new Promise((resolve, reject) => {
           this.canvasBg.toBlob(
               async (blob) => {
@@ -316,7 +427,7 @@ export class FriedMeme extends PolymerElement {
                   resolve();
               },
               mimeType,
-              quality
+              quality,
           );
       });
   }
@@ -334,7 +445,7 @@ export class FriedMeme extends PolymerElement {
               (el as HTMLImageElement).src = url;
               document.body.appendChild(el);
               // end debug */
-              console.debug('loaded jpeg _replaceImgWithJpegBlob');
+              console.debug("loaded jpeg _replaceImgWithJpegBlob");
               URL.revokeObjectURL(url);
               this.ctx.drawImage(this.img, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
               this.img.onerror = previousOnError;
@@ -366,7 +477,6 @@ export class FriedMeme extends PolymerElement {
 
       this.ctx.restore();
   }
-
 
   // private getColorIndicesForCoord(x: number, y: number, width: number) {
   //     const red = y * (width * 4) + x * 4;
@@ -400,8 +510,8 @@ export class FriedMeme extends PolymerElement {
   // }
 
   private randomNoise(width: number, height: number) {
-      const canvas: HTMLCanvasElement = document.createElement('canvas');
-      const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
+      const canvas: HTMLCanvasElement = document.createElement("canvas");
+      const ctx: CanvasRenderingContext2DExtended = canvas.getContext("2d")! as CanvasRenderingContext2DExtended;
       canvas.width = width;
       canvas.height = height;
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -420,8 +530,8 @@ export class FriedMeme extends PolymerElement {
 
       // Roughly Perlin noise
       for (let size = 4; size <= noiseCanvas.width; size *= 2) {
-          let x = Math.floor(Math.random() * noiseCanvas.width) - size;
-          let y = Math.floor(Math.random() * noiseCanvas.height) - size;
+          const x = Math.floor(Math.random() * noiseCanvas.width) - size;
+          const y = Math.floor(Math.random() * noiseCanvas.height) - size;
           this.ctx.drawImage(noiseCanvas, x, y, size, size, 0, 0, this.width, this.height);
       }
 
@@ -431,9 +541,9 @@ export class FriedMeme extends PolymerElement {
   /** Saves at display size, not original size */
   private saveImage() {
       const url = URL.createObjectURL(this.lastBlob);
-      const a = document.createElement('a');
-      a.setAttribute('download', 'true');
-      a.setAttribute('href', url);
+      const a = document.createElement("a");
+      a.setAttribute("download", "true");
+      a.setAttribute("href", url);
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(url);
@@ -442,116 +552,17 @@ export class FriedMeme extends PolymerElement {
 
   private rotate45() {
       const parsed = (this.$.srcimg as HTMLElement).style.transform!.match(/rotate\((\d+)deg\)/);
-      let deg = parsed ? parseInt(parsed[1]) + 90 : 90;
+      let deg = parsed ? parseInt(parsed[1], 10) + 90 : 90;
       if (deg > 270) {
           deg = 0;
       }
 
       const compStyles = window.getComputedStyle((this.$.srcimg as HTMLElement));
-      const width = compStyles.getPropertyValue('width');
-      const height = compStyles.getPropertyValue('height');
+      const width = compStyles.getPropertyValue("width");
+      const height = compStyles.getPropertyValue("height");
       (this.$.srcimg as HTMLElement).style.width = height;
       (this.$.srcimg as HTMLElement).style.height = width;
       (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
-  }
-
-  newImage(src: string) {
-      this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
-      // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
-      this.connectedCallback();
-  }
-
-
-  distortion(e) {
-    if (!this.loaded || this.working) {
-      console.debug('distorition: app working? %b, loaded ? %b', this.working, this.loaded);
-      return;
-    }
-
-    var cx = (e.touches ? e.touches[0].clientX : e.clientX),
-      cy = (e.touches ? e.touches[0].clientY : e.clientY),
-      size = 200,
-      zoom = 1;
-    this.canvasC.width = size;
-    this.canvasC.height = size;
-    this.canvasC.style.left = cx - size / 2 + 'px';
-    this.canvasC.style.top = cy - size / 2 + 'px';
-
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(0, 0, size, size);
-    this.ctx.drawImage(
-        this.canvasBg, 
-        cx - this.canvasBg.offsetLeft - .5 * size / zoom, 
-        cy - this.canvasBg.offsetTop - .5 * size / zoom,
-        size / zoom,
-        size / zoom, 
-        0,
-        0,
-        size,
-        size
-    );
-    
-    const imgData = this.ctx.getImageData(0, 0, size, size),
-      pixels = imgData.data,
-      h = size, w = size;
-    
-    let index = 0;
-    let pixelsCopy: any[] = [];
-    
-    for (let i = 0; i <= pixels.length; i+=4) {
-        pixelsCopy[index] = [pixels[i], pixels[i+1], pixels[i+2], pixels[i+3]];
-        index++;
-    }
-    
-    const result = this.fisheye(pixelsCopy, w, h);
-    
-    for (let i = 0; i < result.length; i++) {
-        index = 4*i;
-        if (result[i] != undefined) {
-            pixels[index + 0] = result[i][0];
-            pixels[index + 1] = result[i][1];
-            pixels[index + 2] = result[i][2]; 
-            pixels[index + 3] = result[i][3];
-        }
-    }
-    
-    this.ctx.putImageData(imgData, 0, 0);
-  }
-
-  fisheye (srcpixels, w, h) {
-    const dstpixels = srcpixels.slice();            
-    
-    for (let y = 0; y < h; y++) {                                
-      const ny = ((2*y)/h)-1;                        
-      const ny2 = ny*ny;                                
-
-      for (let x = 0; x < w; x++) {                            
-        const nx = ((2*x)/w)-1;                    
-        const nx2 = nx*nx;
-        const r = Math.sqrt(nx2+ny2);                
-
-        if (0.0 <= r && r <= 1.0) {                            
-          let nr = Math.sqrt(1.0-r*r);            
-          nr = (r + (1.0-nr)) / 2.0;
-
-          if (nr <= 1.0) {
-            const theta:number = Math.atan2(ny,nx);         
-            const nxn:number = nr*Math.cos(theta);        
-            const nyn:number = nr*Math.sin(theta);        
-            const x2:number = Math.round(((nxn+1)*w)/2);        
-            const y2:number = Math.round(((nyn+1)*h)/2);        
-            const srcpos:number = Math.round(y2*w+x2);            
-            if (srcpos >= 0 && srcpos < w*h) {
-              dstpixels[Math.round(y*w+x)] = srcpixels[srcpos];    
-            }
-          }
-
-        }
-      } // next x
-
-    } // next y
-
-    return dstpixels;
   }
 
 }

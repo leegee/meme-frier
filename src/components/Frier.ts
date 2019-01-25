@@ -1,56 +1,56 @@
-import { PolymerElement, html } from '@polymer/polymer/polymer-element';
-import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings';
-import { } from '@polymer/polymer/lib/elements/dom-repeat';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { } from "@polymer/polymer/lib/elements/dom-repeat";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
+import { setPassiveTouchGestures } from "@polymer/polymer/lib/utils/settings";
+import { html, PolymerElement } from "@polymer/polymer/polymer-element";
 
-import '@polymer/app-layout/app-drawer/app-drawer';
-import '@polymer/app-layout/app-drawer/app-drawer';
-import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
-import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
-import '@polymer/app-layout/app-scroll-effects/app-scroll-effects';
-import '@polymer/app-layout/app-toolbar/app-toolbar';
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/paper-checkbox/paper-checkbox';
-import '@polymer/paper-slider/paper-slider';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-item/paper-item';
-import '@polymer/paper-listbox/paper-listbox';
+import "@polymer/app-layout/app-drawer-layout/app-drawer-layout";
+import "@polymer/app-layout/app-drawer/app-drawer";
+import { AppDrawerElement } from "@polymer/app-layout/app-drawer/app-drawer";
+import "@polymer/app-layout/app-drawer/app-drawer";
+import "@polymer/app-layout/app-scroll-effects/app-scroll-effects";
+import "@polymer/app-layout/app-toolbar/app-toolbar";
+import "@polymer/iron-icons/iron-icons";
+import "@polymer/paper-checkbox/paper-checkbox";
+import "@polymer/paper-dropdown-menu/paper-dropdown-menu";
+import "@polymer/paper-icon-button/paper-icon-button";
+import "@polymer/paper-item/paper-item";
+import "@polymer/paper-listbox/paper-listbox";
+import "@polymer/paper-slider/paper-slider";
 
-import { getTemplate } from './lib/getTemplate';
-import * as view from './Frier.template.html';
+import * as view from "./Frier.template.html";
+import { getTemplate } from "./lib/getTemplate";
 
 setPassiveTouchGestures(true);
 
 export class MemeFrier extends PolymerElement {
-    src!: string;
-    saturation = 2;
-    contrast = 4;
-    brightness = 2;
-    scale = 0.5;
-    jpegQuality = 0.1;
-    totalJpegs = 22;
-    noise = 0.2;
-    hueRotate = 0;
-    addEmojiBefore = true;
-    addEmojiAfter = true;
-    globalCompositeOperation = 'hard-light';
-    globalCompositeOperations!: Array<string>;
-    globalCompositeOperationIndex!: number;
-    blurStdDeviation = 0;
+    public src!: string;
+    public saturation = 2;
+    public contrast = 4;
+    public brightness = 2;
+    public scale = 0.5;
+    public jpegQuality = 0.1;
+    public totalJpegs = 22;
+    public noise = 0.2;
+    public hueRotate = 0;
+    public addEmojiBefore = true;
+    public addEmojiAfter = true;
+    public globalCompositeOperation = "hard-light";
+    public globalCompositeOperations!: string[];
+    public globalCompositeOperationIndex!: number;
+    public blurStdDeviation = 0;
 
     static get template() {
         return getTemplate(view);
     }
 
-    foo() {
-        console.log('foo')
+    public foo() {
+        console.log("foo");
     }
 
-    connectedCallback() {
+    public connectedCallback() {
         super.connectedCallback();
 
-        ['addEmojiBefore', 'addEmojiAfter'].forEach((id) => {
+        ["addEmojiBefore", "addEmojiAfter"].forEach((id) => {
             this.$[id].addEventListener("change", (e: Event) => {
                 this[id] = (this.$[id] as HTMLInputElement).checked;
             });
@@ -77,10 +77,10 @@ export class MemeFrier extends PolymerElement {
             }
         });
 
-        this.$.drawer.addEventListener('tap', (e: Event) => {
+        this.$.drawer.addEventListener("tap", (e: Event) => {
             if (!(this.$.drawer as AppDrawerElement).persistent) {
-                console.log('tapped ', (e.target as HTMLElement).id);
-                if ((e.target as HTMLElement).id.toString() !== 'globalCompositeOperation') {
+                console.log("tapped ", (e.target as HTMLElement).id);
+                if ((e.target as HTMLElement).id.toString() !== "globalCompositeOperation") {
                     (this.$.drawer as AppDrawerElement).close();
                 }
             }
@@ -89,9 +89,9 @@ export class MemeFrier extends PolymerElement {
         this.$.chooseFile.addEventListener("change", (e: Event) => {
             if (e && e.target && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files!.length) {
                 const file = (e.target as HTMLInputElement).files![0];
-                this.$.meme.dispatchEvent(new CustomEvent('new-image', {
-                    detail: URL.createObjectURL(file)
-                }
+                this.$.meme.dispatchEvent(new CustomEvent("new-image", {
+                    detail: URL.createObjectURL(file),
+                },
                 ));
             }
         }, false);
@@ -99,7 +99,7 @@ export class MemeFrier extends PolymerElement {
         afterNextRender(this, () => {
             // If not narrow
             if ((this.$.drawer as AppDrawerElement).persistent) {
-                console.info('Not narrow, so touch opens image');
+                console.info("Not narrow, so touch opens image");
                 this.$.meme.addEventListener("tap", (e: Event) => {
                     (this.$.chooseFile as HTMLElement).click();
                 });
@@ -110,24 +110,22 @@ export class MemeFrier extends PolymerElement {
                 });
 
                 this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
-                    console.log('drop', e);
+                    console.log("drop", e);
                     console.debug(((e as DragEvent).dataTransfer!).items[0]);
                     e.preventDefault();
                     if (((e as DragEvent).dataTransfer!).items &&
-                        ((e as DragEvent).dataTransfer!).items[0].kind === 'file'
+                        ((e as DragEvent).dataTransfer!).items[0].kind === "file"
                     ) {
                         const file = ((e as DragEvent).dataTransfer!).items[0].getAsFile();
                         this.$.meme.dispatchEvent(
-                            new CustomEvent('new-image', {
-                                detail: URL.createObjectURL(file)
-                            })
+                            new CustomEvent("new-image", {
+                                detail: URL.createObjectURL(file),
+                            }),
                         );
                     }
                 }, false);
-            }
-
-            else {
-                console.info('Is narrow, touch opens drawer');
+            } else {
+                console.info("Is narrow, touch opens drawer");
                 this.$.meme.addEventListener("tap", (e: Event) => {
                     (this.$.drawer as AppDrawerElement).open();
                 });
@@ -154,13 +152,13 @@ export class MemeFrier extends PolymerElement {
                 type: Array,
                 value() {
                     return [
-                        '', 'hard-light', 'soft-light', 'overlay',
-                        'lighter', 'multiply', 'screen', 'darken', 'lighten',
-                        'color-dodge', 'color-burn',
-                        'hue', 'saturation', 'color', 'luminosity'
+                        "", "hard-light", "soft-light", "overlay",
+                        "lighter", "multiply", "screen", "darken", "lighten",
+                        "color-dodge", "color-burn",
+                        "hue", "saturation", "color", "luminosity",
                     ];
-                }
-            }
-        }
+                },
+            },
+        };
     }
 }
