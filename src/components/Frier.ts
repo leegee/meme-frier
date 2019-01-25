@@ -4,6 +4,7 @@ import { } from '@polymer/polymer/lib/elements/dom-repeat';
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 import '@polymer/app-layout/app-drawer/app-drawer';
+import '@polymer/app-layout/app-drawer/app-drawer';
 import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
 import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
 import '@polymer/app-layout/app-scroll-effects/app-scroll-effects';
@@ -110,12 +111,12 @@ export class MemeFrier extends PolymerElement {
 
                 this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
                     console.log('drop', e);
-                    console.log((e as DragEvent).dataTransfer.items[0]);
+                    console.debug(((e as DragEvent).dataTransfer!).items[0]);
                     e.preventDefault();
-                    if ((e as DragEvent).dataTransfer.items &&
-                        (e as DragEvent).dataTransfer.items[0].kind === 'file'
+                    if (((e as DragEvent).dataTransfer!).items &&
+                        ((e as DragEvent).dataTransfer!).items[0].kind === 'file'
                     ) {
-                        const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
+                        const file = ((e as DragEvent).dataTransfer!).items[0].getAsFile();
                         this.$.meme.dispatchEvent(
                             new CustomEvent('new-image', {
                                 detail: URL.createObjectURL(file)

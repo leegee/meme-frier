@@ -108,9 +108,9 @@ export class FriedMeme extends PolymerElement {
     }
 
     _propertiesUpdated() {
-        console.log('Enter _propertiesUpdated');
+        console.debug('Enter _propertiesUpdated');
         if (this.originalImg) {
-            console.log('Set srcimg to ', this.originalImg.src);
+            console.debug('Set srcimg to ', this.originalImg.src);
             (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
             this.connectedCallback();
         }
@@ -142,10 +142,10 @@ export class FriedMeme extends PolymerElement {
     }
 
     private async _processChangedProperties() {
-        console.log('Enter _processChangedProperties');
+        console.debug('Enter _processChangedProperties');
 
         if (!this.loaded || this.working) {
-            console.log('Bail from _processChangedProperties:: loaded=%s, running=%s', this.loaded, this.working);
+            console.debug('Bail from _processChangedProperties:: loaded=%s, running=%s', this.loaded, this.working);
             return;
         }
 
@@ -162,11 +162,11 @@ export class FriedMeme extends PolymerElement {
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
         await this._fry();
-        console.log('Leave _processChangedProperties');
+        console.debug('Leave _processChangedProperties');
     }
 
     private async _fry(currentDip = 1) {
-        console.log('Enter _fry');
+        console.debug('Enter _fry');
         this.working = true;
 
         if (this.numberOfDips > 1) {
@@ -201,7 +201,7 @@ export class FriedMeme extends PolymerElement {
 
         document.body.style.cursor = 'default';
         this.working = false;
-        console.log('Leave _fry');
+        console.debug('Leave _fry');
     }
 
     private async _filterImage() {
@@ -214,8 +214,8 @@ export class FriedMeme extends PolymerElement {
             + (this.blurStdDeviation > 0 ? `url("#${this.blurFilterId}") ` : '')
             ;
 
-        console.log('filter =', this.ctx.filter);
-        console.log('globalCompositeOperation=', this.globalCompositeOperation);
+        console.info('filter =', this.ctx.filter);
+        console.info('globalCompositeOperation=', this.globalCompositeOperation);
 
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
@@ -270,7 +270,7 @@ export class FriedMeme extends PolymerElement {
         );
         this.canvas = canvas;
         this.ctx = ctx;
-        console.log('made size ', this.canvas.width, this.canvas.height);
+        console.debug('made size ', this.canvas.width, this.canvas.height);
     }
 
     private async _lossySave() {
@@ -281,13 +281,13 @@ export class FriedMeme extends PolymerElement {
             if (width > 50 && height > 50) {
                 this._resize(width, height);
                 this._resize(this.width, this.height);
-                console.log('rescale in _lossySave');
+                console.debug('rescale in _lossySave');
             } else {
-                console.log('no rescale, ', width, height);
+                console.debug('no rescale, ', width, height);
             }
         }
         const quality = Math.max(0, this.jpegQuality + Math.log(this.totalJpegs - this.jpegItteration) * 0.15);
-        console.log('scale/quality %s / %s', this.scale, quality);
+        console.debug('scale/quality %s / %s', this.scale, quality);
         await this._saveToImg(
             'image/jpeg',
             quality
@@ -323,7 +323,7 @@ export class FriedMeme extends PolymerElement {
                 (el as HTMLImageElement).src = url;
                 document.body.appendChild(el);
                 // end debug */
-                console.log('loaded jpeg _replaceImgWithJpegBlob');
+                console.debug('loaded jpeg _replaceImgWithJpegBlob');
                 URL.revokeObjectURL(url);
                 this.ctx.drawImage(this.img, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
                 this.img.onerror = previousOnError;
