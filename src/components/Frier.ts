@@ -23,28 +23,24 @@ import { getTemplate } from "./lib/getTemplate";
 setPassiveTouchGestures(true);
 
 export class MemeFrier extends PolymerElement {
-    public src!: string;
-    public saturation = 2;
-    public contrast = 4;
-    public brightness = 2;
-    public scale = 0.5;
-    public jpegQuality = 0.1;
-    public totalJpegs = 22;
-    public noise = 0.2;
-    public hueRotate = 0;
-    public addEmojiBefore = true;
     public addEmojiAfter = true;
-    public globalCompositeOperation = "hard-light";
-    public globalCompositeOperations!: string[];
-    public globalCompositeOperationIndex!: number;
+    public addEmojiBefore = true;
     public blurStdDeviation = 0;
+    public brightness = 2;
+    public contrast = 4;
+    public globalCompositeOperation = "hard-light";
+    public globalCompositeOperationIndex!: number;
+    public globalCompositeOperations!: string[];
+    public hueRotate = 0;
+    public jpegQuality = 0.1;
+    public noise = 0.2;
+    public saturation = 2;
+    public scale = 0.5;
+    public src!: string;
+    public totalJpegs = 22;
 
     static get template() {
         return getTemplate(view);
-    }
-
-    public foo() {
-        console.log("foo");
     }
 
     public connectedCallback() {
