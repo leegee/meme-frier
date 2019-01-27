@@ -189,7 +189,6 @@ export class FriedMeme extends PolymerElement {
     this.working = true;
 
     const size = 200;
-    const zoom = 2;
 
     const e =
       this.lastFisheyeInputEvent instanceof TouchEvent
@@ -198,8 +197,19 @@ export class FriedMeme extends PolymerElement {
 
     var srcimgBoundingClientRect = this.$.srcimg.getBoundingClientRect();
 
-    const cx: number = e.clientX - srcimgBoundingClientRect.left - (size / 2);
-    const cy: number = e.clientY - srcimgBoundingClientRect.top - (size / 2);
+    const cx: number = e.clientX - srcimgBoundingClientRect.left - 0.5 * sizeß;
+    const cy: number = e.clientY - srcimgBoundingClientRect.top - 0.5 * size;
+
+    if (!this.preLensImageData) {
+      this.preLensImageData = this.ctx.getImageData(
+        0,
+        0,
+        this.width,
+        this.height
+      );
+    } else {
+      this.ctx.putImageData(this.preLensImageData, 0, 0);
+    }
 
     const imgSample = this.ctx.getImageData(cx, cy, size, size);
 
@@ -226,19 +236,8 @@ export class FriedMeme extends PolymerElement {
       }
     }
 
-    if (!this.preLensImageData) {
-      this.preLensImageData = this.ctx.getImageData(
-        0,
-        0,
-        this.width,
-        this.height
-      );
-    } else {
-      this.ctx.putImageData(this.preLensImageData, 0, 0);
-    }
-
     this.ctx.putImageData(imgSample, cx, cy);
-    
+
     await this._losslessSave();
 
     console.debug("Saved fisheye");
@@ -246,7 +245,11 @@ export class FriedMeme extends PolymerElement {
   }
 
   // Thanks for the maths: https://codepen.io/anon/pen/yZOBpz
-  private fisheye(srcpixels: number[][], width: number, height: number): number[][] {
+  private fisheye(
+    srcpixels: number[][],
+    width: number,
+    height: number
+  ): number[][] {
     const dstpixels: number[][] = srcpixels.slice();
 
     for (let y = 0; y < height; y++) {
@@ -270,7 +273,10 @@ export class FriedMeme extends PolymerElement {
             const y2 = Math.round(((nyn + 1) * height) / 2);
             const srcpos = Math.round(y2 * width + x2);
             if (srcpos >= 0 && srcpos < width * height) {
-              dstpixels[Math.round(y * width + x)] = srcpixels[srcpos];
+              const dstIndex = Math.round(y * width + x);
+              if (srcpos < srcpixels.length && dstIndex < dstpixels.length) {
+                dstpixels[dstIndex] = srcpixels[srcpos];
+              }
             }
           }
         }
@@ -420,7 +426,7 @@ export class FriedMeme extends PolymerElement {
   }
 
   private async _losslessSave() {
-    await this._saveToImg("image/png", 1);
+    return await this._saveToImg("image/png", 1);
   }
 
   private _resize(width: number, height: number) {
@@ -479,6 +485,7 @@ export class FriedMeme extends PolymerElement {
             reject(new TypeError(`_lossySave expected a blob`));
           }
           await this._replaceImgWithJpegBlob(blob!);
+          console.log("Done _saveToImg");
           resolve();
         },
         mimeType,
@@ -515,6 +522,7 @@ export class FriedMeme extends PolymerElement {
         );
         this.img.onerror = previousOnError;
         this.img.onload = previousOnLoad;
+        console.log("Done replaceImgWithBlob");
         resolve();
       };
       this.img.src = url;
