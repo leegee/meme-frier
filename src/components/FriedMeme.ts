@@ -79,10 +79,8 @@ export class FriedMeme extends PolymerElement {
 
   private img!: HTMLImageElement;
   private lastBlob!: Blob;
-  private canvasBg!: HTMLCanvasElement;
-  private canvasC!: HTMLCanvasElement;
+  private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2DExtended;
-  private ctxC!: CanvasRenderingContext2DExtended;
   private debugging = false;
   private originalImg!: HTMLImageElement;
   private width!: number;
@@ -108,21 +106,19 @@ export class FriedMeme extends PolymerElement {
   private addEmojiBefore = true;
   private addEmojiAfter = true;
 
-  constructor() {
-    super();
-    window.addEventListener("mousemove", e => this.distortionFromEvent(e));
-    window.addEventListener("touchmove", e => this.distortionFromEvent(e));
-  }
-
   public ready() {
     super.ready();
-    this.addEventListener("rotate45", () => {
-      this.rotate45();
-    });
 
-    this.addEventListener("save-image", () => {
-      this.saveImage();
-    });
+    this.$.srcimg.addEventListener("mousemove", (e: any) =>
+      this.distortionFromEvent(e as MouseEvent | TouchEvent)
+    );
+    this.$.srcimg.addEventListener("touchmove", (e: any) =>
+      this.distortionFromEvent(e as MouseEvent | TouchEvent)
+    );
+
+    this.addEventListener("rotate45", () => this.rotate45());
+
+    this.addEventListener("save-image", () => this.saveImage());
 
     this.addEventListener("new-image", (e: CustomEvent | Event) => {
       this.newImage((e as CustomEvent).detail);
@@ -169,58 +165,53 @@ export class FriedMeme extends PolymerElement {
     this.connectedCallback();
   }
 
-  private distortionFromEvent(e: MouseEvent | TouchEvent) {
-    this.lastFisheyeInputEvent = e;
-    console.log((e as MouseEvent).clientX, (e as MouseEvent).clientY);
-    this._processChangedProperties();
+  private async distortionFromEvent(e: MouseEvent | TouchEvent) {
+    if (!this.working && this.loaded) {
+      this.lastFisheyeInputEvent = e;
+      this._processChangedProperties({ noFry: true });
+      await this.addFisheyeDistortion();
+    }
   }
 
-  private addFisheyeDistortion() {
+  private async addFisheyeDistortion() {
     if (!this.lastFisheyeInputEvent) {
       return;
     }
 
+    if (!this.loaded || this.working) {
+      console.debug(
+        "addFisheyeDistortion, bail-out: loaded=%s, working=%s",
+        this.loaded,
+        this.working
+      );
+      return;
+    }
+    this.working = true;
+
     const size = 200;
     const zoom = 2;
 
-    const e: MouseEvent | TouchEvent = this.lastFisheyeInputEvent;
+    const e =
+      this.lastFisheyeInputEvent instanceof TouchEvent
+        ? (this.lastFisheyeInputEvent as TouchEvent).touches[0]
+        : (this.lastFisheyeInputEvent as MouseEvent);
 
-    const cx: number = (e as TouchEvent).touches
-      ? (e as TouchEvent).touches[0].clientX
-      : (e as MouseEvent).clientX;
-    const cy: number = (e as TouchEvent).touches
-      ? (e as TouchEvent).touches[0].clientY
-      : (e as MouseEvent).clientY;
+    var rect = this.$.srcimg.getBoundingClientRect();
+    // console.log(rect.top, rect.right, rect.bottom, rect.left);
 
-    this.canvasC.width = size;
-    this.canvasC.height = size;
+    const cx: number = e.clientX - rect.left - size / 2;
+    const cy: number = e.clientY - rect.top - size / 2;
 
-    this.ctxC.fillStyle = "#000";
-    this.ctxC.fillRect(0, 0, size, size);
+    const imgSample = this.ctx.getImageData(cx, cy, size, size);
 
-    this.ctxC.drawImage(
-      this.canvasBg,
-      cx - this.img.offsetLeft - 0.5 * (size / zoom),
-      cy - this.img.offsetTop - 0.5 * (size / zoom),
-      size / zoom,
-      size / zoom,
-      0,
-      0,
-      size,
-      size
-    );
+    let pixelsCopy: number[][] = [];
 
-    // const imgData = this.ctx.getImageData(0, 0, size, size),
-    const imgData = this.ctxC.getImageData(0, 0, size, size);
-
-    const pixelsCopy: any[] = [];
-
-    for (let i = 0; i <= imgData.data.length; i += 4) {
+    for (let i = 0; i <= imgSample.data.length; i += 4) {
       pixelsCopy.push([
-        imgData.data[i],
-        imgData.data[i + 1],
-        imgData.data[i + 2],
-        imgData.data[i + 3]
+        imgSample.data[i],
+        imgSample.data[i + 1],
+        imgSample.data[i + 2],
+        imgSample.data[i + 3]
       ]);
     }
 
@@ -229,25 +220,30 @@ export class FriedMeme extends PolymerElement {
     for (let i = 0; i < result.length; i++) {
       const index = 4 * i;
       if (result[i] !== undefined) {
-        imgData.data[index + 0] = result[i][0] = 5;
-        imgData.data[index + 1] = result[i][1] = 5;
-        imgData.data[index + 2] = result[i][2] = 5;
-        imgData.data[index + 3] = result[i][3] = 255;
+        imgSample.data[index + 0] = result[i][0];
+        imgSample.data[index + 1] = result[i][1];
+        imgSample.data[index + 2] = result[i][2];
+        imgSample.data[index + 3] = result[i][3];
       }
     }
 
-    this.ctx.putImageData(imgData, 0, 0);
+    this.ctx.putImageData(imgSample, cx, cy);
+    await this._losslessSave();
+
+    console.debug("Saved fisheye");
+    this.working = false;
   }
 
-  private fisheye(srcpixels, w, h) {
-    const dstpixels = srcpixels.slice();
+  // Thanks for the maths: https://codepen.io/anon/pen/yZOBpz
+  private fisheye(srcpixels: number[][], w: number, h: number): number[][] {
+    const dstpixels: number[][] = srcpixels.slice();
 
     for (let y = 0; y < h; y++) {
-      const ny = 2 * y / h - 1;
+      const ny = (2 * y) / h - 1;
       const ny2 = ny * ny;
 
       for (let x = 0; x < w; x++) {
-        const nx = 2 * x / w - 1;
+        const nx = (2 * x) / w - 1;
         const nx2 = nx * nx;
         const r = Math.sqrt(nx2 + ny2);
 
@@ -256,24 +252,23 @@ export class FriedMeme extends PolymerElement {
           nr = (r + (1.0 - nr)) / 2.0;
 
           if (nr <= 1.0) {
-            const theta: number = Math.atan2(ny, nx);
-            const nxn: number = nr * Math.cos(theta);
-            const nyn: number = nr * Math.sin(theta);
-            const x2: number = Math.round(((nxn + 1) * w) / 2);
-            const y2: number = Math.round(((nyn + 1) * h) / 2);
-            const srcpos: number = Math.round(y2 * w + x2);
-            if (srcpos >= 0 && srcpos < w * h) {
-              dstpixels[Math.round(y * (w + x))] = srcpixels[srcpos];
+            const theta = Math.atan2(ny, nx);
+            const nxn = nr * Math.cos(theta);
+            const nyn = nr * Math.sin(theta);
+            const x2 = Math.floor(((nxn + 1) * w) / 2);
+            const y2 = Math.floor(((nyn + 1) * h) / 2);
+            const srcpos = Math.floor(y2 * w + x2);
+            if ((srcpos >= 0) && (srcpos < w * h)) {
+              dstpixels[Math.floor(y * w + x)] = srcpixels[srcpos];
             }
           }
         }
-      } // next x
-    } // next y
-
+      }
+    }
     return dstpixels;
   }
 
-  private async _processChangedProperties() {
+  private async _processChangedProperties(options = { noFry: false }) {
     console.debug("Enter _processChangedProperties");
 
     if (!this.loaded || this.working) {
@@ -284,31 +279,27 @@ export class FriedMeme extends PolymerElement {
       );
       return;
     }
-
-    document.body.style.cursor = "wait";
     const previousWorking = this.working;
-    console.debug("_processChangedProperties setting working to true");
     this.working = true;
 
-    this.canvasBg = this.canvasBg || document.createElement("canvas");
-    this.canvasC = this.canvasC || document.createElement("canvas");
+    document.body.style.cursor = "wait";
+    console.debug("_processChangedProperties setting working to true");
+
+    this.canvas = this.canvas || document.createElement("canvas");
 
     // What size to opeate upon...?
-    this.width = this.canvasBg.width = this.canvasC.width = this.img.width;
-    this.height = this.canvasBg.height = this.canvasC.height = this.img.height;
+    this.width = this.canvas.width = this.img.width;
+    this.height = this.canvas.height = this.img.height;
 
-    this.canvasC.style.marginLeft = -this.width / 2 + "px";
-    this.canvasC.style.marginTop = -this.height / 2 + "px";
-
-    this.ctxC = this.canvasC.getContext(
+    this.ctx = this.canvas.getContext(
       "2d"
     )! as CanvasRenderingContext2DExtended;
-    this.ctx = this.canvasBg.getContext(
-      "2d"
-    )! as CanvasRenderingContext2DExtended;
+
     this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
 
-    await this._fry();
+    if (options.noFry === false) {
+      await this._fry();
+    }
 
     this.working = previousWorking;
     console.debug(
@@ -332,8 +323,8 @@ export class FriedMeme extends PolymerElement {
     }
 
     await this._filterImage();
-    await this.addFisheyeDistortion();
 
+    // Mess up quality by repeatedly saving?
     for (
       this.jpegItteration = 1;
       this.jpegItteration <= this.totalJpegs;
@@ -387,8 +378,9 @@ export class FriedMeme extends PolymerElement {
       "2d"
     )! as CanvasRenderingContext2DExtended;
     ctx2.filter = `url("#${this.convFilterId}")  `;
-    ctx2.drawImage(this.canvasBg, 0, 0, this.width, this.height);
-    this.canvasBg = canvas2;
+    ctx2.drawImage(this.canvas, 0, 0, this.width, this.height);
+    this.canvas = canvas2;
+    console.debug("put filtered img to canvas");
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
@@ -405,14 +397,14 @@ export class FriedMeme extends PolymerElement {
     // ctx.globalCompositeOperation = 'overlay'; this.globalCompositeOperation;
     // ctx.globalAlpha = 0.9;
 
-    ctx.drawImage(this.canvasBg, 0, 0, this.width, this.height);
+    ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
 
     ctx.globalCompositeOperation = this.globalCompositeOperation;
     ctx.globalAlpha = this.globalCompositeAlpha;
     ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
 
     ctx.restore();
-    this.canvasBg = canvas;
+    this.canvas = canvas;
     this.ctx = ctx;
   }
 
@@ -428,25 +420,25 @@ export class FriedMeme extends PolymerElement {
     canvas.width = width;
     canvas.height = height;
     ctx.drawImage(
-      this.canvasBg,
+      this.canvas,
       0,
       0,
-      this.canvasBg.width,
-      this.canvasBg.height,
+      this.canvas.width,
+      this.canvas.height,
       0,
       0,
       canvas.width,
       canvas.height
     );
-    this.canvasBg = canvas;
+    this.canvas = canvas;
     this.ctx = ctx;
-    console.debug("made size ", this.canvasBg.width, this.canvasBg.height);
+    console.debug("made size ", this.canvas.width, this.canvas.height);
   }
 
   private async _lossySave() {
     // Make even worse:
     if (this.scale !== 1) {
-        console.log('scale', this.scale);
+      console.debug("scale", this.scale);
       const width = this.width * this.scale;
       const height = this.height * this.scale;
       if (width > 50 && height > 50) {
@@ -470,7 +462,7 @@ export class FriedMeme extends PolymerElement {
     quality: number = this.jpegQuality
   ) {
     return new Promise((resolve, reject) => {
-      this.canvasBg.toBlob(
+      this.canvas.toBlob(
         async blob => {
           if (blob === null) {
             reject(new TypeError(`_lossySave expected a blob`));
@@ -521,8 +513,8 @@ export class FriedMeme extends PolymerElement {
   private _addEmoji() {
     this.ctx.save();
 
-    const minSize = this.canvasBg.height / 8;
-    const maxSize = this.canvasBg.height / 4;
+    const minSize = this.canvas.height / 8;
+    const maxSize = this.canvas.height / 4;
     const textSize = Math.floor(Math.random() * (maxSize - minSize)) + minSize;
 
     this.ctx.globalAlpha = (Math.random() + 0.2) / 0.7;
