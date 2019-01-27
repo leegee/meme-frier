@@ -78,6 +78,7 @@ export class FriedMeme extends PolymerElement {
   protected working = false;
 
   private img!: HTMLImageElement;
+  private preLensImageData!: ImageData;
   private lastBlob!: Blob;
   private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2DExtended;
@@ -168,7 +169,6 @@ export class FriedMeme extends PolymerElement {
   private async distortionFromEvent(e: MouseEvent | TouchEvent) {
     if (!this.working && this.loaded) {
       this.lastFisheyeInputEvent = e;
-      this._processChangedProperties({ noFry: true });
       await this.addFisheyeDistortion();
     }
   }
@@ -196,11 +196,10 @@ export class FriedMeme extends PolymerElement {
         ? (this.lastFisheyeInputEvent as TouchEvent).touches[0]
         : (this.lastFisheyeInputEvent as MouseEvent);
 
-    var rect = this.$.srcimg.getBoundingClientRect();
-    // console.log(rect.top, rect.right, rect.bottom, rect.left);
+    var srcimgBoundingClientRect = this.$.srcimg.getBoundingClientRect();
 
-    const cx: number = e.clientX - rect.left - size / 2;
-    const cy: number = e.clientY - rect.top - size / 2;
+    const cx: number = e.clientX - srcimgBoundingClientRect.left - (size / 2);
+    const cy: number = e.clientY - srcimgBoundingClientRect.top - (size / 2);
 
     const imgSample = this.ctx.getImageData(cx, cy, size, size);
 
@@ -227,7 +226,19 @@ export class FriedMeme extends PolymerElement {
       }
     }
 
+    if (!this.preLensImageData) {
+      this.preLensImageData = this.ctx.getImageData(
+        0,
+        0,
+        this.width,
+        this.height
+      );
+    } else {
+      this.ctx.putImageData(this.preLensImageData, 0, 0);
+    }
+
     this.ctx.putImageData(imgSample, cx, cy);
+    
     await this._losslessSave();
 
     console.debug("Saved fisheye");
@@ -235,15 +246,15 @@ export class FriedMeme extends PolymerElement {
   }
 
   // Thanks for the maths: https://codepen.io/anon/pen/yZOBpz
-  private fisheye(srcpixels: number[][], w: number, h: number): number[][] {
+  private fisheye(srcpixels: number[][], width: number, height: number): number[][] {
     const dstpixels: number[][] = srcpixels.slice();
 
-    for (let y = 0; y < h; y++) {
-      const ny = (2 * y) / h - 1;
+    for (let y = 0; y < height; y++) {
+      const ny = (2 * y) / height - 1;
       const ny2 = ny * ny;
 
-      for (let x = 0; x < w; x++) {
-        const nx = (2 * x) / w - 1;
+      for (let x = 0; x < width; x++) {
+        const nx = (2 * x) / width - 1;
         const nx2 = nx * nx;
         const r = Math.sqrt(nx2 + ny2);
 
@@ -255,11 +266,11 @@ export class FriedMeme extends PolymerElement {
             const theta = Math.atan2(ny, nx);
             const nxn = nr * Math.cos(theta);
             const nyn = nr * Math.sin(theta);
-            const x2 = Math.floor(((nxn + 1) * w) / 2);
-            const y2 = Math.floor(((nyn + 1) * h) / 2);
-            const srcpos = Math.floor(y2 * w + x2);
-            if ((srcpos >= 0) && (srcpos < w * h)) {
-              dstpixels[Math.floor(y * w + x)] = srcpixels[srcpos];
+            const x2 = Math.round(((nxn + 1) * width) / 2);
+            const y2 = Math.round(((nyn + 1) * height) / 2);
+            const srcpos = Math.round(y2 * width + x2);
+            if (srcpos >= 0 && srcpos < width * height) {
+              dstpixels[Math.round(y * width + x)] = srcpixels[srcpos];
             }
           }
         }
