@@ -9,8 +9,8 @@
   },
   "main": "src/index.html",
   "license": "MIT",
-  "flat": true,
   "scripts": {
+    "flat": true,
     "dev": "webpack-dashboard -- webpack-dev-server --config ./webpack.dev.conf.js",
     "start": "webpack-dashboard -- webpack-dev-server --open --config ./webpack.dev.conf.js",
     "build": "rm -rf dist/* && webpack --config ./webpack.prod.conf.js",

@@ -32,7 +32,7 @@ export class MemeFrier extends PolymerElement {
     public jpegQuality = 0.1;
     public noise = 0.2;
     public saturation = 2;
-    public scale = 0.5;
+    public scale = 1; // 0.5;
     public src!: string;
     public totalJpegs = 22;
 
@@ -65,16 +65,16 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
-            if (! (this.$.drawer as AppDrawerElement).persistent) {
-                (this.$.drawer as AppDrawerElement).close();
+            if (! ((this.$.drawer as unknown) as AppDrawerElement).persistent) {
+                ((this.$.drawer as unknown) as AppDrawerElement).close();
             }
         });
 
         this.$.drawer.addEventListener("tap", (e: Event) => {
-            if (!(this.$.drawer as AppDrawerElement).persistent) {
+            if (!((this.$.drawer as unknown) as AppDrawerElement).persistent) {
                 console.log("tapped ", (e.target as HTMLElement).id);
                 if ((e.target as HTMLElement).id.toString() !== "globalCompositeOperation") {
-                    (this.$.drawer as AppDrawerElement).close();
+                    ((this.$.drawer as unknown) as AppDrawerElement).close();
                 }
             }
         });
@@ -91,7 +91,7 @@ export class MemeFrier extends PolymerElement {
 
         afterNextRender(this, () => {
             // If not narrow
-            if ((this.$.drawer as AppDrawerElement).persistent) {
+            if (((this.$.drawer as unknown) as AppDrawerElement).persistent) {
                 console.info("Not narrow, so touch opens image");
                 this.$.meme.addEventListener("tap", (e: Event) => {
                     (this.$.chooseFile as HTMLElement).click();
@@ -120,7 +120,7 @@ export class MemeFrier extends PolymerElement {
             } else {
                 console.info("Is narrow, touch opens drawer");
                 this.$.meme.addEventListener("tap", (e: Event) => {
-                    (this.$.drawer as AppDrawerElement).open();
+                    ((this.$.drawer as unknown) as AppDrawerElement).open();
                 });
             }
         });
