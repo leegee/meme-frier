@@ -29,6 +29,7 @@
     "@polymer/paper-slider": "^3.0.1",
     "@polymer/polymer": "^3.0.5",
     "@webcomponents/webcomponentsjs": "1.0.14",
+    "b64-to-blob": "^1.2.19",
     "neon-animation-polymer-3": "^3.0.0",
     "web-animations-js": "^2.3.1"
   },

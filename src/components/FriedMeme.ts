@@ -95,6 +95,7 @@ export class FriedMeme extends PolymerElement {
   private totalJpegs = 1;
   private jpegQuality = 1; // 0.01; // 0 - 1
   private scale = 1;
+  private src!: string;
   private blurStdDeviation = 0; // 0 - 1
   private brightness = 1; // 1 is default
   private saturate = 2; // 1 is default
@@ -127,7 +128,7 @@ export class FriedMeme extends PolymerElement {
   }
 
   public _propertiesUpdated() {
-    console.debug("Enter _propertiesUpdated");
+    // console.debug("Enter _propertiesUpdated");
     if (this.originalImg) {
       console.debug("Set srcimg to ", this.originalImg.src);
       (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
@@ -155,15 +156,21 @@ export class FriedMeme extends PolymerElement {
     this.img = this.$.srcimg as HTMLImageElement;
     this.img.onload = null;
     this.originalImg = new Image();
-    this.originalImg.src = this.img.src;
+    this.src = this.originalImg.src = this.img.src;
 
     this._processChangedProperties();
   }
 
   public newImage(src: string) {
-    this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
+    delete this.originalImg.width;
+    delete this.originalImg.height;
+    (this.$
+      .srcimg as HTMLImageElement).src = this.originalImg.src = this.src = this.img.src = src;
+    this.width = this.originalImg.width;
+    this.height = this.originalImg.height;
+    // this.ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
     // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
-    this.connectedCallback();
+    this._propertiesUpdated();
   }
 
   private async distortionFromEvent(e: MouseEvent | TouchEvent) {
@@ -240,7 +247,7 @@ export class FriedMeme extends PolymerElement {
 
     await this._losslessSave();
 
-    console.debug("Saved fisheye");
+    // console.debug("Saved fisheye");
     this.working = false;
   }
 
@@ -286,7 +293,7 @@ export class FriedMeme extends PolymerElement {
   }
 
   private async _processChangedProperties(options = { noFry: false }) {
-    console.debug("Enter _processChangedProperties");
+    // console.debug("Enter _processChangedProperties");
 
     if (!this.loaded || this.working) {
       console.debug(
@@ -300,7 +307,7 @@ export class FriedMeme extends PolymerElement {
     this.working = true;
 
     document.body.style.cursor = "wait";
-    console.debug("_processChangedProperties setting working to true");
+    // console.debug("_processChangedProperties setting working to true");
 
     this.canvas = this.canvas || document.createElement("canvas");
 
@@ -319,10 +326,7 @@ export class FriedMeme extends PolymerElement {
     }
 
     this.working = previousWorking;
-    console.debug(
-      "Leave _processChangedProperties, set working to %s",
-      this.working
-    );
+    // console.debug( "Leave _processChangedProperties, set working to %s", this.working );
   }
 
   private async _fry(currentDip = 1) {
@@ -410,12 +414,7 @@ export class FriedMeme extends PolymerElement {
     canvas.height = this.height;
     ctx.save();
 
-    // ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
-    // ctx.globalCompositeOperation = 'overlay'; this.globalCompositeOperation;
-    // ctx.globalAlpha = 0.9;
-
     ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
-
     ctx.globalCompositeOperation = this.globalCompositeOperation;
     ctx.globalAlpha = this.globalCompositeAlpha;
     ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
@@ -470,7 +469,7 @@ export class FriedMeme extends PolymerElement {
       0,
       this.jpegQuality + Math.log(this.totalJpegs - this.jpegItteration) * 0.15
     );
-    console.debug("scale/quality %s / %s", this.scale, quality);
+    // console.debug("scale/quality %s / %s", this.scale, quality);
     await this._saveToImg("image/jpeg", quality);
   }
 
@@ -485,7 +484,7 @@ export class FriedMeme extends PolymerElement {
             reject(new TypeError(`_lossySave expected a blob`));
           }
           await this._replaceImgWithJpegBlob(blob!);
-          console.log("Done _saveToImg");
+          // console.debug("Done _saveToImg");
           resolve();
         },
         mimeType,
@@ -507,7 +506,7 @@ export class FriedMeme extends PolymerElement {
         (el as HTMLImageElement).src = url;
         document.body.appendChild(el);
         // end debug */
-        console.debug("loaded jpeg _replaceImgWithJpegBlob");
+        // console.debug("loaded jpeg _replaceImgWithJpegBlob");
         URL.revokeObjectURL(url);
         this.ctx.drawImage(
           this.img,
@@ -522,7 +521,7 @@ export class FriedMeme extends PolymerElement {
         );
         this.img.onerror = previousOnError;
         this.img.onload = previousOnLoad;
-        console.log("Done replaceImgWithBlob");
+        // console.debug("Done replaceImgWithBlob");
         resolve();
       };
       this.img.src = url;
