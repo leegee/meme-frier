@@ -74,6 +74,17 @@
     border-radius: 50%;
     pointer-events: none;
   }
+
+  #float-right-icon {
+    display: block;
+    float: right;
+    background: var(--app-primary-color);
+    margin-left: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    color: white;
+    font-size: 60%;
+  }
 </style>
 
 <input type="file" id="chooseFile" />
@@ -119,7 +130,9 @@
 
 <app-drawer-layout fullbleed narrow="{{ narrow }}">
   <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-    <app-toolbar>Meme Deep Frier</app-toolbar>
+    <app-toolbar>Meme Deep Frier
+      <span id='float-right-icon'>LOAD</span>
+    </app-toolbar>
 
     <div id="controls" class="group">
       <label>Saturation</label>

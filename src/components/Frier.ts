@@ -92,10 +92,11 @@ export class MemeFrier extends PolymerElement {
         afterNextRender(this, () => {
             // If not narrow
             if (((this.$.drawer as unknown) as AppDrawerElement).persistent) {
-                console.info("Not narrow, so touch opens image");
-                this.$.meme.addEventListener("tap", (e: Event) => {
-                    (this.$.chooseFile as HTMLElement).click();
-                });
+                // console.info("Not narrow, so touch opens image");
+                // this.$.meme.addEventListener("tap", (e: Event) => 
+                //     (this.$.chooseFile as HTMLElement).click()
+                // );
+                this.$['float-right-icon'].addEventListener('click', (e) => (this.$.chooseFile as HTMLElement).click());
 
                 // Drag and drop for non-narrow
                 this.$.meme.addEventListener("dragover", (e) => {
