@@ -197,7 +197,7 @@ export class FriedMeme extends PolymerElement {
 
     var srcimgBoundingClientRect = this.$.srcimg.getBoundingClientRect();
 
-    const cx: number = e.clientX - srcimgBoundingClientRect.left - 0.5 * sizeß;
+    const cx: number = e.clientX - srcimgBoundingClientRect.left - 0.5 * size;
     const cy: number = e.clientY - srcimgBoundingClientRect.top - 0.5 * size;
 
     if (!this.preLensImageData) {
