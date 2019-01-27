@@ -141,120 +141,148 @@
           <label>Lens width</label>
           <paper-slider
             style="width: 100%;"
-            label="Lends Width"
+            label="Lens Width"
             value="{{ lensWidth }}"
             min="10"
-            max="1000"
-            step="100"
+            max="1010"
+            step="50"
           ></paper-slider>
         </div>
         <div style="width:50%; float: right">
           <label>Lens height</label>
           <paper-slider
             style="width: 100%;"
-            label="Lends Height"
+            label="Lens Height"
             value="{{ lensHeight }}"
             min="10"
-            max="1000"
-            step="100"
+            max="1010"
+            step="50"
           ></paper-slider>
         </div>
       </div>
 
-      <label>Saturation</label>
-      <paper-slider
-        label="Saturation"
-        value="{{ saturation }}"
-        min="0"
-        max="4"
-        step="0.1"
-      ></paper-slider>
+      <div>
+        <div style="width:50%;float:left">
+          <label>Saturation</label>
+          <paper-slider
+            label="Saturation"
+            style="width: 100%;"
+            value="{{ saturation }}"
+            min="0"
+            max="4"
+            step="0.1"
+          ></paper-slider>
+        </div>
+        <div style="width:50%; float: right">
+          <label>Contrast</label>
+          <paper-slider
+            label="Contrast"
+            style="width: 100%;"
+            value="{{ contrast }}"
+            min="0"
+            max="10"
+            step="0.5"
+          ></paper-slider>
+        </div>
+      </div>
 
-      <label>Contrast</label>
-      <paper-slider
-        label="Contrast"
-        value="{{ contrast }}"
-        min="0"
-        max="10"
-        step="0.5"
-      ></paper-slider>
+      <div>
+        <div style="width:50%;float:left">
+          <label>Brightness</label>
+          <paper-slider
+            label="Brightness"
+            style="width: 100%;"
+            value="{{ brightness }}"
+            min="0"
+            max="10"
+            step="0.5"
+          ></paper-slider>
+        </div>
+        <div style="width:50%; float: right">
+          <label>Quality</label>
+          <paper-slider
+            label="Quality"
+            style="width: 100%;"
+            value="{{ jpegQuality }}"
+            min="0.0001"
+            max="1"
+            step="0.05"
+          ></paper-slider>
+        </div>
+      </div>
 
-      <label>Brightness</label>
-      <paper-slider
-        label="Brightness"
-        value="{{ brightness }}"
-        min="0"
-        max="10"
-        step="0.5"
-      ></paper-slider>
+      <div>
+        <div style="width:50%;float:left">
+          <label>Rescale</label>
+          <paper-slider
+            label="Rescale"
+            style="width: 100%;"
+            value="{{ scale }}"
+            min="0.1"
+            max="1"
+            step="0.05"
+          ></paper-slider>
+        </div>
+        <div style="width:50%; float: right">
+          <label>Iterations</label>
+          <paper-slider
+            label="Iterations"
+            style="width: 100%;"
+            value="{{ totalJpegs }}"
+            min="1"
+            max="300"
+            step="1"
+          ></paper-slider>
+        </div>
+      </div>
 
-      <label>Quality</label>
-      <paper-slider
-        label="Quality"
-        value="{{ jpegQuality }}"
-        min="0.0001"
-        max="1"
-        step="0.05"
-      ></paper-slider>
-
-      <label>Rescale</label>
-      <paper-slider
-        label="Rescale"
-        value="{{ scale }}"
-        min="0.1"
-        max="1"
-        step="0.05"
-      ></paper-slider>
-
-      <label>Iterations</label>
-      <paper-slider
-        label="Iterations"
-        value="{{ totalJpegs }}"
-        min="1"
-        max="300"
-        step="1"
-      ></paper-slider>
-
-      <label>Nose opacity</label>
-      <paper-slider
-        label="Noise opacity"
-        value="{{ noise }}"
-        min="0"
-        max="1"
-        step="0.01"
-      ></paper-slider>
-
-      <label>Blur</label>
-      <paper-slider
-        label="Blur"
-        value="{{ blurStdDeviation }}"
-        min="0"
-        max="1"
-        step="0.1"
-      ></paper-slider>
+      <div>
+        <div style="width:50%;float:left">
+          <label>Nose opacity</label>
+          <paper-slider
+            label="Noise opacity"
+            style="width: 100%;"
+            value="{{ noise }}"
+            min="0"
+            max="1"
+            step="0.01"
+          ></paper-slider>
+        </div>
+        <div style="width:50%; float: right">
+          <label>Blur</label>
+          <paper-slider
+            label="Blur"
+            style="width: 100%;"
+            value="{{ blurStdDeviation }}"
+            min="0"
+            max="1"
+            step="0.1"
+          ></paper-slider>
+        </div>
+      </div>
 
       <label>Hue</label>
       <paper-slider
         label="Hue Rotate"
+        style="width: 100%;"
         value="{{ hueRotate }}"
         min="-180"
         max="180"
         step="10"
-      ></paper-slider>
+      >
+      </paper-slider>
 
-      <div class="group">
-        <paper-dropdown-menu label="Filter" id="globalCompositeOperation">
-          <paper-listbox
-            slot="dropdown-content"
-            id="globalCompositeOperations"
-            selected="[[globalCompositeOperationIndex]]"
-          >
-            <template is="dom-repeat" items="{{ globalCompositeOperations }}">
-              <paper-item>{{ item }}</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-      </div>
+      <paper-dropdown-menu label="Filter" id="globalCompositeOperation">
+        <paper-listbox
+          slot="dropdown-content"
+          id="globalCompositeOperations"
+          selected="[[globalCompositeOperationIndex]]"
+        >
+          <template is="dom-repeat" items="{{ globalCompositeOperations }}">
+            <paper-item>{{ item }}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
 
       <div class="group">
         <paper-checkbox id="addEmojiBefore" checked="{{ addEmojiBefore }}">
