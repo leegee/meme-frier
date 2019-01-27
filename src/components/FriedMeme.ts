@@ -13,6 +13,59 @@ import { CanvasRenderingContext2DExtended } from "./lib/CanvasRenderingContext2D
 import { getTemplate } from "./lib/getTemplate";
 
 export class FriedMeme extends PolymerElement {
+  public emojis = [
+    "🤑",
+    "😭",
+    "😨",
+    "😧",
+    "😱",
+    "😫",
+    "😩",
+    "😃",
+    "😄",
+    "😭",
+    "😆",
+    "😢",
+    "😭"
+  ];
+  public convFilterKernel!: string;
+
+  protected loaded = false;
+  protected working = false;
+
+  private img!: HTMLImageElement;
+  private preLensImageData!: ImageData | null;
+  private lastBlob!: Blob;
+  private canvas!: HTMLCanvasElement;
+  private ctx!: CanvasRenderingContext2DExtended;
+  private debugging = false;
+  private originalImg!: HTMLImageElement;
+  private width!: number;
+  private height!: number;
+  private jpegItteration!: number;
+  private lastFisheyeInputEvent!: MouseEvent | TouchEvent;
+
+  private blurFilterId!: string;
+  private convFilterId!: string;
+  private numberOfDips = 1;
+  private totalJpegs = 1;
+  private jpegQuality = 1; // 0.01; // 0 - 1
+  private lensWidth = 300;
+  private lensHeight = 150;
+  private scale = 1;
+  private src!: string;
+  private blurStdDeviation = 0; // 0 - 1
+  private brightness = 1; // 1 is default
+  private saturate = 2; // 1 is default
+  private contrast = 4; // 1 is default
+  private hueRotate = 0; // 0 (deg) is default
+  private useSharpness = true;
+  private noise = 0; // 0.1; // 0-1
+  private globalCompositeOperation = "hard-light";
+  private globalCompositeAlpha = 0.5;
+  private addEmojiBefore = true;
+  private addEmojiAfter = true;
+
   static get properties() {
     return {
       addEmojiAfter: { type: Boolean },
@@ -38,6 +91,8 @@ export class FriedMeme extends PolymerElement {
       numberOfDips: { type: Number },
       saturate: { type: Number }, // 1 is default
       scale: { type: Number },
+      sizex: { type: Number },
+      sizey: { type: Number },
       src: { type: String, reflectToAttribute: true }, // 1 is default
       totalJpegs: { type: Number },
       useSharpness: { type: Boolean }
@@ -56,57 +111,6 @@ export class FriedMeme extends PolymerElement {
       "_propertiesUpdated(" + Object.keys(FriedMeme.properties).join(",") + ")"
     ];
   }
-
-  public emojis = [
-    "🤑",
-    "😭",
-    "😨",
-    "😧",
-    "😱",
-    "😫",
-    "😩",
-    "😃",
-    "😄",
-    "😭",
-    "😆",
-    "😢",
-    "😭"
-  ];
-  public convFilterKernel!: string;
-
-  protected loaded = false;
-  protected working = false;
-
-  private img!: HTMLImageElement;
-  private preLensImageData!: ImageData;
-  private lastBlob!: Blob;
-  private canvas!: HTMLCanvasElement;
-  private ctx!: CanvasRenderingContext2DExtended;
-  private debugging = false;
-  private originalImg!: HTMLImageElement;
-  private width!: number;
-  private height!: number;
-  private jpegItteration!: number;
-  private lastFisheyeInputEvent!: MouseEvent | TouchEvent;
-
-  private blurFilterId!: string;
-  private convFilterId!: string;
-  private numberOfDips = 1;
-  private totalJpegs = 1;
-  private jpegQuality = 1; // 0.01; // 0 - 1
-  private scale = 1;
-  private src!: string;
-  private blurStdDeviation = 0; // 0 - 1
-  private brightness = 1; // 1 is default
-  private saturate = 2; // 1 is default
-  private contrast = 4; // 1 is default
-  private hueRotate = 0; // 0 (deg) is default
-  private useSharpness = true;
-  private noise = 0; // 0.1; // 0-1
-  private globalCompositeOperation = "hard-light";
-  private globalCompositeAlpha = 0.5;
-  private addEmojiBefore = true;
-  private addEmojiAfter = true;
 
   public ready() {
     super.ready();
@@ -143,34 +147,37 @@ export class FriedMeme extends PolymerElement {
     };
   }
 
-  public imageLoaded() {
-    this.loaded = true;
-    this.working = false;
-    (this.$.srcimg as HTMLElement).style.rotate = "0deg";
+  public newImage(src: string) {
+    this.loaded = false;
+    // (this.$.srcimg as HTMLImageElement).parentNode!.replaceChild(
+    //   new Image(),
+    //   this.$.srcimg
+    // );
+    (this.$.srcimg as HTMLImageElement).onload = () => {
+      this.imageLoaded();
+      // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
+      // this._propertiesUpdated();
+    };
 
-    delete (this.$.srcimg as HTMLImageElement).width;
-    delete (this.$.srcimg as HTMLImageElement).height;
-    delete (this.$.srcimg as HTMLElement).style.width;
-    delete (this.$.srcimg as HTMLElement).style.height;
-
-    this.img = this.$.srcimg as HTMLImageElement;
-    this.img.onload = null;
-    this.originalImg = new Image();
-    this.src = this.originalImg.src = this.img.src;
-
-    this._processChangedProperties();
+    (this.$.srcimg as HTMLImageElement).src = src;
   }
 
-  public newImage(src: string) {
-    delete this.originalImg.width;
-    delete this.originalImg.height;
-    (this.$
-      .srcimg as HTMLImageElement).src = this.originalImg.src = this.src = this.img.src = src;
-    this.width = this.originalImg.width;
-    this.height = this.originalImg.height;
-    // this.ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
-    // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
-    this._propertiesUpdated();
+  public imageLoaded() {
+    this.img = this.$.srcimg as HTMLImageElement;
+    this.img.style.rotate = "0deg";
+    this.img.onload = null;
+    delete this.img.width;
+    delete this.img.height;
+    delete this.img.style.width;
+    delete this.img.style.height;
+    this.originalImg = new Image();
+    this.preLensImageData = null;
+    this.src = this.originalImg.src = this.img.src;
+
+    this.loaded = true;
+    this.working = false;
+
+    this._processChangedProperties();
   }
 
   private async distortionFromEvent(e: MouseEvent | TouchEvent) {
@@ -186,16 +193,9 @@ export class FriedMeme extends PolymerElement {
     }
 
     if (!this.loaded || this.working) {
-      console.debug(
-        "addFisheyeDistortion, bail-out: loaded=%s, working=%s",
-        this.loaded,
-        this.working
-      );
       return;
     }
     this.working = true;
-
-    const size = 200;
 
     const e =
       this.lastFisheyeInputEvent instanceof TouchEvent
@@ -204,21 +204,28 @@ export class FriedMeme extends PolymerElement {
 
     var srcimgBoundingClientRect = this.$.srcimg.getBoundingClientRect();
 
-    const cx: number = e.clientX - srcimgBoundingClientRect.left - 0.5 * size;
-    const cy: number = e.clientY - srcimgBoundingClientRect.top - 0.5 * size;
+    const cx: number =
+      e.clientX - srcimgBoundingClientRect.left - 0.5 * this.lensWidth;
+    const cy: number =
+      e.clientY - srcimgBoundingClientRect.top - 0.5 * this.lensHeight;
 
     if (!this.preLensImageData) {
       this.preLensImageData = this.ctx.getImageData(
         0,
         0,
-        this.width,
-        this.height
+        this.img.width,
+        this.img.height
       );
     } else {
       this.ctx.putImageData(this.preLensImageData, 0, 0);
     }
 
-    const imgSample = this.ctx.getImageData(cx, cy, size, size);
+    const imgSample = this.ctx.getImageData(
+      cx,
+      cy,
+      this.lensWidth,
+      this.lensHeight
+    );
 
     let pixelsCopy: number[][] = [];
 
@@ -231,7 +238,7 @@ export class FriedMeme extends PolymerElement {
       ]);
     }
 
-    const result = this.fisheye(pixelsCopy, size, size);
+    const result = this.fisheye(pixelsCopy, this.lensWidth, this.lensHeight);
 
     for (let i = 0; i < result.length; i++) {
       const index = 4 * i;
@@ -294,7 +301,6 @@ export class FriedMeme extends PolymerElement {
 
   private async _processChangedProperties(options = { noFry: false }) {
     // console.debug("Enter _processChangedProperties");
-
     if (!this.loaded || this.working) {
       console.debug(
         "_processChangedProperties, bail-out: loaded=%s, working=%s",
@@ -312,14 +318,14 @@ export class FriedMeme extends PolymerElement {
     this.canvas = this.canvas || document.createElement("canvas");
 
     // What size to opeate upon...?
-    this.width = this.canvas.width = this.img.width;
-    this.height = this.canvas.height = this.img.height;
+    this.canvas.width = this.img.width;
+    this.canvas.height = this.img.height;
 
     this.ctx = this.canvas.getContext(
       "2d"
     )! as CanvasRenderingContext2DExtended;
 
-    this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
+    this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height);
 
     if (options.noFry === false) {
       await this._fry();
@@ -386,20 +392,20 @@ export class FriedMeme extends PolymerElement {
     console.info("filter =", this.ctx.filter);
     console.info("globalCompositeOperation=", this.globalCompositeOperation);
 
-    this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
+    this.ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height);
 
     if (this.noise > 0) {
       this.addNoise();
     }
 
     const canvas2: HTMLCanvasElement = document.createElement("canvas");
-    canvas2.width = this.width;
-    canvas2.height = this.height;
+    canvas2.width = this.img.width;
+    canvas2.height = this.img.height;
     const ctx2: CanvasRenderingContext2DExtended = canvas2.getContext(
       "2d"
     )! as CanvasRenderingContext2DExtended;
     ctx2.filter = `url("#${this.convFilterId}")  `;
-    ctx2.drawImage(this.canvas, 0, 0, this.width, this.height);
+    ctx2.drawImage(this.canvas, 0, 0, this.img.width, this.img.height);
     this.canvas = canvas2;
     console.debug("put filtered img to canvas");
   }
@@ -410,14 +416,14 @@ export class FriedMeme extends PolymerElement {
     const ctx: CanvasRenderingContext2DExtended = canvas.getContext(
       "2d"
     )! as CanvasRenderingContext2DExtended;
-    canvas.width = this.width;
-    canvas.height = this.height;
+    canvas.width = this.img.width;
+    canvas.height = this.img.height;
     ctx.save();
 
-    ctx.drawImage(this.canvas, 0, 0, this.width, this.height);
+    ctx.drawImage(this.canvas, 0, 0, this.img.width, this.img.height);
     ctx.globalCompositeOperation = this.globalCompositeOperation;
     ctx.globalAlpha = this.globalCompositeAlpha;
-    ctx.drawImage(this.originalImg, 0, 0, this.width, this.height);
+    ctx.drawImage(this.originalImg, 0, 0, this.img.width, this.img.height);
 
     ctx.restore();
     this.canvas = canvas;
@@ -455,11 +461,11 @@ export class FriedMeme extends PolymerElement {
     // Make even worse:
     if (this.scale !== 1) {
       console.debug("scale", this.scale);
-      const width = this.width * this.scale;
-      const height = this.height * this.scale;
+      const width = this.img.width * this.scale;
+      const height = this.img.height * this.scale;
       if (width > 50 && height > 50) {
         this._resize(width, height);
-        this._resize(this.width, this.height);
+        this._resize(this.img.width, this.img.height);
         console.debug("rescale in _lossySave");
       } else {
         console.debug("no rescale, ", width, height);
@@ -512,12 +518,12 @@ export class FriedMeme extends PolymerElement {
           this.img,
           0,
           0,
-          this.width,
-          this.height,
+          this.img.width,
+          this.img.height,
           0,
           0,
-          this.width,
-          this.height
+          this.img.width,
+          this.img.height
         );
         this.img.onerror = previousOnError;
         this.img.onload = previousOnLoad;
@@ -540,8 +546,8 @@ export class FriedMeme extends PolymerElement {
 
     const emoji = this.emojis[Math.floor(Math.random() * this.emojis.length)];
 
-    const x = Math.floor(Math.random() * (this.width - textSize));
-    const y = Math.floor(Math.random() * (this.height - textSize)) + textSize;
+    const x = Math.floor(Math.random() * (this.img.width - textSize));
+    const y = Math.floor(Math.random() * (this.img.height - textSize)) + textSize;
     this.ctx.translate(x, y);
 
     this.ctx.rotate(Math.random() * (Math.random() >= 0.5 ? 1 : -1));
@@ -599,7 +605,7 @@ export class FriedMeme extends PolymerElement {
   }
 
   private addNoise() {
-    const noiseCanvas = this.randomNoise(this.width, this.height);
+    const noiseCanvas = this.randomNoise(this.img.width, this.img.height);
     this.ctx.save();
     this.ctx.globalAlpha = this.noise;
 
@@ -615,8 +621,8 @@ export class FriedMeme extends PolymerElement {
         size,
         0,
         0,
-        this.width,
-        this.height
+        this.img.width,
+        this.img.height
       );
     }
 

@@ -130,11 +130,37 @@
 
 <app-drawer-layout fullbleed narrow="{{ narrow }}">
   <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-    <app-toolbar>Meme Deep Frier
-      <span id='float-right-icon'>LOAD</span>
+    <app-toolbar
+      >Meme Deep Frier
+      <span id="float-right-icon">LOAD</span>
     </app-toolbar>
 
     <div id="controls" class="group">
+      <div>
+        <div style="width:50%;float:left">
+          <label>Lens width</label>
+          <paper-slider
+            style="width: 100%;"
+            label="Lends Width"
+            value="{{ lensWidth }}"
+            min="10"
+            max="1000"
+            step="100"
+          ></paper-slider>
+        </div>
+        <div style="width:50%; float: right">
+          <label>Lens height</label>
+          <paper-slider
+            style="width: 100%;"
+            label="Lends Height"
+            value="{{ lensHeight }}"
+            min="10"
+            max="1000"
+            step="100"
+          ></paper-slider>
+        </div>
+      </div>
+
       <label>Saturation</label>
       <paper-slider
         label="Saturation"
