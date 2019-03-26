@@ -55,6 +55,10 @@ export class MemeFrier extends PolymerElement {
             });
         });
 
+        this.$.fisheye.addEventListener("click", (e: Event) => {
+            (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("fisheye"));
+        });
+
         this.$.rotate45.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
         });

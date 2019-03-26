@@ -94,6 +94,10 @@ export class FriedMeme extends PolymerElement {
 
     ready() {
         super.ready();
+        this.addEventListener('fisheye', () => {
+            this.fisheye();
+        });
+
         this.addEventListener('rotate45', () => {
             this.rotate45();
         });
@@ -180,6 +184,7 @@ export class FriedMeme extends PolymerElement {
         await this._filterImage();
 
         for (this.jpegItteration = 1; this.jpegItteration <= this.totalJpegs; this.jpegItteration++) {
+            // this.status = 'Saving ' + this.jpegItteration + '/' + this.totalJpegs ;
             await this._lossySave();
         }
 
@@ -442,6 +447,10 @@ export class FriedMeme extends PolymerElement {
         (this.$.srcimg as HTMLElement).style.width = height;
         (this.$.srcimg as HTMLElement).style.height = width;
         (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
+    }
+
+    private fisheye() {
+        
     }
 
     newImage(src: string) {

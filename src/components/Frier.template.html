@@ -127,7 +127,7 @@
             <label>Hue</label>
             <paper-slider label="Hue Rotate" value={{hueRotate}} min=-180 max=180 step=10></paper-slider>
 
-            <div class='group'>
+            <div class="group">
                 <paper-dropdown-menu label="Filter" id="globalCompositeOperation">
                     <paper-listbox slot="dropdown-content" id="globalCompositeOperations" selected="[[globalCompositeOperationIndex]]">
                         <template is="dom-repeat" items="{{globalCompositeOperations}}">
@@ -137,19 +137,20 @@
                 </paper-dropdown-menu>
             </div>
 
-            <div class='group'>
+            <div class="group">
                 <paper-checkbox id="addEmojiBefore" checked="{{addEmojiBefore}}">
-                    <iron-icon icon='myicons:tag-faces'></iron-icon>Before
+                    <iron-icon icon="myicons:tag-faces"></iron-icon>Before
                 </paper-checkbox>
                 <paper-checkbox id="addEmojiAfter" checked="{{addEmojiAfter}}">
-                    <iron-icon icon='myicons:tag-faces'></iron-icon>After
+                    <iron-icon icon="myicons:tag-faces"></iron-icon>After
                 </paper-checkbox>
             </div>
 
-            <div class='group'>
-                <paper-icon-button id="rotate45" icon="myicons:rotate-right">Rotate</paper-icon-button>
-                <paper-icon-button id="load" icon="myicons:file-upload">Load</paper-icon-button>
-                <paper-icon-button id="save" icon="myicons:file-download">Save</paper-icon-button>
+            <div class="group">
+                <paper-icon-button id="fisheye" icon="myicons:tag-faces" title="Fish eye">Fish Eye</paper-icon-button>
+                <paper-icon-button id="rotate45" icon="myicons:rotate-right" title="Rotate">Rotate</paper-icon-button>
+                <paper-icon-button id="load" icon="myicons:file-upload" title="Load">Load</paper-icon-button>
+                <paper-icon-button id="save" icon="myicons:file-download" title="Save">Save</paper-icon-button>
             </div>
         </div>
     </app-drawer>
