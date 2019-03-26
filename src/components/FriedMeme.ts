@@ -9,6 +9,8 @@
  */
 import { CanvasRenderingContext2DExtended } from './lib/CanvasRenderingContext2DExtended.interface';
 import { PolymerElement } from '@polymer/polymer/polymer-element';
+
+import { Fisheye } from './lib/Fisheye';
 import { getTemplate } from './lib/getTemplate';
 import * as view from './FriedMeme.template.html';
 
@@ -79,9 +81,6 @@ export class FriedMeme extends PolymerElement {
 
     static get template() {
         return getTemplate(view);
-        // // Because Polymer is not quite as advertised:
-        // const stringArray = [`${view}`];
-        // return html({ raw: stringArray, ...stringArray } as TemplateStringsArray);
     }
 
     static get observers() {
@@ -92,7 +91,7 @@ export class FriedMeme extends PolymerElement {
         ]
     }
 
-    ready() {
+    ready(): void {
         super.ready();
         this.addEventListener('fisheye', () => {
             this.fisheye();
@@ -111,7 +110,7 @@ export class FriedMeme extends PolymerElement {
         });
     }
 
-    _propertiesUpdated() {
+    _propertiesUpdated(): void {
         console.log('Enter _propertiesUpdated');
         if (this.originalImg) {
             console.log('Set srcimg to ', this.originalImg.src);
@@ -120,14 +119,14 @@ export class FriedMeme extends PolymerElement {
         }
     }
 
-    connectedCallback() {
+    connectedCallback(): void {
         super.connectedCallback();
         (this.$.srcimg as HTMLImageElement).onload = () => {
             this.imageLoaded();
         };
     }
 
-    imageLoaded() {
+    imageLoaded(): void {
         this.loaded = true;
         this.working = false;
         (this.$.srcimg as HTMLElement).style.rotate = '0deg';
@@ -145,7 +144,7 @@ export class FriedMeme extends PolymerElement {
         this._processChangedProperties();
     }
 
-    private async _processChangedProperties() {
+    private async _processChangedProperties(): Promise<void> {
         console.log('Enter _processChangedProperties');
 
         if (!this.loaded || this.working) {
@@ -169,7 +168,7 @@ export class FriedMeme extends PolymerElement {
         console.log('Leave _processChangedProperties');
     }
 
-    private async _fry(currentDip = 1) {
+    private async _fry(currentDip = 1): Promise<void> {
         console.log('Enter _fry');
         this.working = true;
 
@@ -209,7 +208,7 @@ export class FriedMeme extends PolymerElement {
         console.log('Leave _fry');
     }
 
-    private async _filterImage() {
+    private async _filterImage(): Promise<void> {
         this.ctx.filter = ''
             + `saturate(${this.saturate}) `
             + (this.useSharpness ? `url("#${this.convFilterId}") ` : '')
@@ -238,7 +237,7 @@ export class FriedMeme extends PolymerElement {
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
-    private _overlay() {
+    private _overlay(): void {
         const canvas: HTMLCanvasElement = document.createElement('canvas');
         const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         canvas.width = this.width;
@@ -260,11 +259,11 @@ export class FriedMeme extends PolymerElement {
         this.ctx = ctx;
     }
 
-    private async _losslessSave() {
+    private async _losslessSave(): Promise<void> {
         await this._saveToImg('image/png', 1);
     }
 
-    private _resize(width: number, height: number) {
+    private _resize(width: number, height: number): void {
         let canvas: HTMLCanvasElement = document.createElement('canvas');
         let ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         canvas.width = width;
@@ -278,7 +277,7 @@ export class FriedMeme extends PolymerElement {
         console.log('made size ', this.canvas.width, this.canvas.height);
     }
 
-    private async _lossySave() {
+    private async _lossySave(): Promise<void> {
         // Make even worse:
         if (this.scale !== 1) {
             const width = this.width * this.scale;
@@ -299,7 +298,7 @@ export class FriedMeme extends PolymerElement {
         );
     }
 
-    private _saveToImg(mimeType: string = 'image/jpeg', quality: number = this.jpegQuality) {
+    private _saveToImg(mimeType: string = 'image/jpeg', quality: number = this.jpegQuality): Promise<void> {
         return new Promise((resolve, reject) => {
             this.canvas.toBlob(
                 async (blob) => {
@@ -315,7 +314,7 @@ export class FriedMeme extends PolymerElement {
         });
     }
 
-    private _replaceImgWithJpegBlob(blob: Blob) {
+    private _replaceImgWithJpegBlob(blob: Blob): Promise<void> {
         return new Promise((resolve, reject) => {
             this.lastBlob = blob;
             const url = URL.createObjectURL(blob);
@@ -339,7 +338,7 @@ export class FriedMeme extends PolymerElement {
         });
     }
 
-    private _addEmoji() {
+    private _addEmoji(): void {
         this.ctx.save();
 
         const minSize = this.canvas.height / 8;
@@ -393,7 +392,7 @@ export class FriedMeme extends PolymerElement {
     //     ctx.putImageData(imgData, 0, 0);
     // }
 
-    private randomNoise(width: number, height: number) {
+    private randomNoise(width: number, height: number): HTMLCanvasElement {
         const canvas: HTMLCanvasElement = document.createElement('canvas');
         const ctx: CanvasRenderingContext2DExtended = canvas.getContext('2d')! as CanvasRenderingContext2DExtended;
         canvas.width = width;
@@ -407,7 +406,7 @@ export class FriedMeme extends PolymerElement {
         return canvas;
     }
 
-    private addNoise() {
+    private addNoise(): void {
         const noiseCanvas = this.randomNoise(this.width, this.height);
         this.ctx.save();
         this.ctx.globalAlpha = this.noise;
@@ -423,7 +422,7 @@ export class FriedMeme extends PolymerElement {
     }
 
     /** Saves at display size, not original size */
-    private saveImage() {
+    private saveImage(): void {
         const url = URL.createObjectURL(this.lastBlob);
         const a = document.createElement('a');
         a.setAttribute('download', 'true');
@@ -434,7 +433,7 @@ export class FriedMeme extends PolymerElement {
         a.remove();
     }
 
-    private rotate45() {
+    private rotate45(): void {
         const parsed = (this.$.srcimg as HTMLElement).style.transform!.match(/rotate\((\d+)deg\)/);
         let deg = parsed ? parseInt(parsed[1]) + 90 : 90;
         if (deg > 270) {
@@ -449,11 +448,13 @@ export class FriedMeme extends PolymerElement {
         (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
     }
 
-    private fisheye() {
-        
+    private fisheye(): void {
+        console.info((this.$.srcimg as HTMLElement).offsetLeft);
+        const f = new Fisheye(this.$.fisheye, this.canvas, 200);
+        f.run();
     }
 
-    newImage(src: string) {
+    newImage(src: string): void {
         this.img.src = (this.$.srcimg as HTMLImageElement).src = src;
         // TODO URL.revokeObjectURL( (e as CustomEvent).detail );
         this.connectedCallback();
