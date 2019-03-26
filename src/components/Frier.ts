@@ -1,7 +1,7 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element';
 import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings';
 import { } from '@polymer/polymer/lib/elements/dom-repeat';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status';
 
 import '@polymer/app-layout/app-drawer/app-drawer';
 import { AppDrawerElement } from '@polymer/app-layout/app-drawer/app-drawer';
@@ -55,15 +55,15 @@ export class MemeFrier extends PolymerElement {
             });
         });
 
-        this.$.rotate45.addEventListener("tap", (e: Event) => {
+        this.$.rotate45.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("rotate45"));
         });
 
-        this.$.save.addEventListener("tap", (e: Event) => {
+        this.$.save.addEventListener("click", (e: Event) => {
             (this.$.meme as HTMLElement).dispatchEvent(new CustomEvent("save-image"));
         });
 
-        this.$.load.addEventListener("tap", (e: Event) => {
+        this.$.load.addEventListener("click", (e: Event) => {
             (this.$.chooseFile as HTMLElement).click();
         });
 
@@ -71,16 +71,16 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
-            if (! (this.$.drawer as AppDrawerElement).persistent) {
-                (this.$.drawer as AppDrawerElement).close();
+            if (! (this.$.drawer as unknown as AppDrawerElement).persistent) {
+                (this.$.drawer as unknown as AppDrawerElement).close();
             }
         });
 
-        this.$.drawer.addEventListener('tap', (e: Event) => {
-            if (!(this.$.drawer as AppDrawerElement).persistent) {
-                console.log('tapped ', (e.target as HTMLElement).id);
+        this.$.drawer.addEventListener('click', (e: Event) => {
+            if (!(this.$.drawer as unknown as AppDrawerElement).persistent) {
+                console.log('clickped ', (e.target as HTMLElement).id);
                 if ((e.target as HTMLElement).id.toString() !== 'globalCompositeOperation') {
-                    (this.$.drawer as AppDrawerElement).close();
+                    (this.$.drawer as unknown as AppDrawerElement).close();
                 }
             }
         });
@@ -97,9 +97,9 @@ export class MemeFrier extends PolymerElement {
 
         afterNextRender(this, () => {
             // If not narrow
-            if ((this.$.drawer as AppDrawerElement).persistent) {
+            if ((this.$.drawer as unknown as AppDrawerElement).persistent) {
                 console.info('Not narrow, so touch opens image');
-                this.$.meme.addEventListener("tap", (e: Event) => {
+                this.$.meme.addEventListener("click", (e: Event) => {
                     (this.$.chooseFile as HTMLElement).click();
                 });
 
@@ -127,8 +127,8 @@ export class MemeFrier extends PolymerElement {
 
             else {
                 console.info('Is narrow, touch opens drawer');
-                this.$.meme.addEventListener("tap", (e: Event) => {
-                    (this.$.drawer as AppDrawerElement).open();
+                this.$.meme.addEventListener("click", (e: Event) => {
+                    (this.$.drawer as unknown as AppDrawerElement).open();
                 });
             }
         });
