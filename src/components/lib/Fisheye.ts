@@ -10,76 +10,85 @@ export class Fisheye {
     memeCanvas!: HTMLCanvasElement;
     fisheyeCanvas!: HTMLCanvasElement;
     fisheyeCtx!: CanvasRenderingContext2DExtended;
-    size = 200;
+    listeners: { [key: string]: EventListenerOrEventListenerObject; } = {};
+    sizeX = 200;
+    sizeY = 200;
+    zoomX = 1;
+    zoomY = 1;
 
-    zoom = 1;
-
-    constructor(_fisheyeCanvas, _memeCanvas, _size) {
-        if (typeof _size !== 'undefined') {
-            this.size = _size;
+    constructor(_fisheyeCanvas, _memeCanvas, _sizeX, _sizeY = null) {
+        if (typeof _sizeX !== 'undefined') {
+            this.sizeX = _sizeX;
+        }
+        if (typeof _sizeY !== 'undefined') {
+            this.sizeY = this.sizeX;
         }
         this.memeCanvas = _memeCanvas;
         this.fisheyeCanvas = _fisheyeCanvas;
         this.fisheyeCtx = _fisheyeCanvas.getContext('2d');
 
+        this.fisheyeCanvas.style.display = 'block';
         this.fisheyeCanvas.width = this.memeCanvas.width;
         this.fisheyeCanvas.height = this.memeCanvas.height;
     }
 
     run(): void {
-        window.addEventListener("mousemove", this.moved.bind(this));
-        window.addEventListener("touchmove", this.moved.bind(this));
-        window.addEventListener("click", this.click.bind(this));
-        window.addEventListener("dblclick", this.dblclick.bind(this));
+        this.listeners.mousemouse = this.moved.bind(this); 
+        this.listeners.touchmove = this.moved.bind(this);
+        this.listeners.click = this.click.bind(this);
+        window.addEventListener("mousemove", this.listeners.mousemouse);
+        window.addEventListener("touchmove", this.listeners.touchmove);
+        window.addEventListener("click", this.listeners.click);
     }
 
     destructor(): void {
-        window.removeEventListener("mousemove", this.moved.bind(this));
-        window.removeEventListener("touchmove", this.moved.bind(this));
-        window.removeEventListener("click", this.click.bind(this));
-        window.removeEventListener("dblclick", this.dblclick.bind(this));
+        window.removeEventListener("mousemove", this.listeners.mousemouse);
+        window.removeEventListener("touchmove", this.listeners.touchmove);
+        window.removeEventListener("click", this.listeners.click);
+        const ctx = this.memeCanvas.getContext('2d');
+        ctx!.drawImage( 
+            this.fisheyeCanvas, 
+            parseInt(this.fisheyeCanvas.style.left || ''),
+            parseInt(this.fisheyeCanvas.style.top || '')
+        );
+        this.fisheyeCanvas.style.display = 'none';
     }
 
-    dblclick(e): void {
-        e.preventDefault();
-    }
 
     click(e): void {
         e.preventDefault();
     }
 
-    moved(e) { // : MouseEvent | TouchEvent
+    moved(e): void { // : MouseEvent | TouchEvent
         e.preventDefault();
 
         const cx = (e.touches ? e.touches[0].clientX : e.clientX);
         const cy = (e.touches ? e.touches[0].clientY : e.clientY);
 
         this.fisheyeCanvas.style.position = 'absolute';
-        this.fisheyeCanvas.width = this.size;
-        this.fisheyeCanvas.height = this.size;
-        this.fisheyeCanvas.style.left = cx - this.size / 2 + 'px';
-        this.fisheyeCanvas.style.top = cy - this.size / 2 + 'px';
+        this.fisheyeCanvas.width = this.sizeX;
+        this.fisheyeCanvas.height = this.sizeY;
+        this.fisheyeCanvas.style.left = cx - this.sizeX / 2 + 'px';
+        this.fisheyeCanvas.style.top = cy - this.sizeY / 2 + 'px';
 
         this.fisheyeCtx.fillStyle = '#000';
-        this.fisheyeCtx.fillRect(0, 0, this.size, this.size);
+        this.fisheyeCtx.fillRect(0, 0, this.sizeX, this.sizeY);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
-            cx - .5 * this.size / this.zoom,
-            cy - .5 * this.size / this.zoom,
-            // cx - this.memeCanvas.offsetLeft - .5 * this.size / zoom,
-            // cy - this.memeCanvas.offsetTop - .5 * this.size / zoom,
-            this.size / this.zoom,
-            this.size / this.zoom,
+            cx - this.memeCanvas.offsetLeft - .5 * this.sizeX / this.zoomX,
+            cy - this.memeCanvas.offsetTop - .5 * this.sizeY / this.zoomY,
+            this.sizeX / this.zoomX,
+            this.sizeY / this.zoomY,
             0,
             0,
-            this.size,
-            this.size
+            this.sizeX,
+            this.sizeY
         );
 
-        const imgData = this.fisheyeCtx.getImageData(0, 0, this.size, this.size);
+        const imgData = this.fisheyeCtx.getImageData(0, 0, this.sizeX, this.sizeY);
         const pixels = imgData.data;
-        const h = this.size;
-        const w = this.size;
+        const h = this.sizeX;
+        const w = this.sizeY;
         let pixelsCopy: any = []; // Uint8ClampedArray
         let index = 0;
 

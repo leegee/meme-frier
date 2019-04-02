@@ -82,7 +82,7 @@ export class MemeFrier extends PolymerElement {
 
         this.$.drawer.addEventListener('click', (e: Event) => {
             if (!(this.$.drawer as unknown as AppDrawerElement).persistent) {
-                console.log('clickped ', (e.target as HTMLElement).id);
+                console.log('click ', (e.target as HTMLElement).id);
                 if ((e.target as HTMLElement).id.toString() !== 'globalCompositeOperation') {
                     (this.$.drawer as unknown as AppDrawerElement).close();
                 }
@@ -112,9 +112,7 @@ export class MemeFrier extends PolymerElement {
                     e.preventDefault();
                 });
 
-                this.$.meme.addEventListener("drop", (e) => { // (e: DragEvent) produces type error
-                    console.log('drop', e);
-                    console.log((e as DragEvent).dataTransfer.items[0]);
+                this.$.meme.addEventListener("drop", (e: Event) => {
                     e.preventDefault();
                     if ((e as DragEvent).dataTransfer.items &&
                         (e as DragEvent).dataTransfer.items[0].kind === 'file'

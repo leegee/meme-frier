@@ -28,6 +28,8 @@ export class FriedMeme extends PolymerElement {
     private width!: number;
     private height!: number;
     private jpegItteration!: number;
+    private iFisheye!: Fisheye;
+    private fisheyeExitListener!: any; // TODO
 
     private blurFilterId!: string;
     private convFilterId!: string;
@@ -450,8 +452,17 @@ export class FriedMeme extends PolymerElement {
 
     private fisheye(): void {
         console.info((this.$.srcimg as HTMLElement).offsetLeft);
-        const f = new Fisheye(this.$.fisheye, this.canvas, 200);
-        f.run();
+        this.iFisheye = new Fisheye(this.$.fisheye, this.canvas, 200);
+        this.iFisheye.run();
+        this.fisheyeExitListener = this.applyFisheye.bind(this);
+        window.addEventListener("dblclick", this.fisheyeExitListener);
+    }
+
+    private async applyFisheye(e: MouseEvent): Promise<void> {
+        e.preventDefault();
+        this.iFisheye.destructor();
+        window.removeEventListener("dblclick", this.fisheyeExitListener);
+        await this._losslessSave();
     }
 
     newImage(src: string): void {
