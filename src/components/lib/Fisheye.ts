@@ -8,17 +8,27 @@ export class Fisheye {
     src = "https://lumiere-a.akamaihd.net/v1/images/r_thorragnarok_header_nowplaying_47d36193.jpeg?region=0,0,2048,680";
 
     memeCanvas!: HTMLCanvasElement;
-    memeImg: HTMLImageElement;
     fisheyeCanvas!: HTMLCanvasElement;
     fisheyeCtx!: CanvasRenderingContext2DExtended;
     listeners: { [key: string]: EventListenerOrEventListenerObject; } = {};
     sizeX = 200;
     sizeY = 200;
+    boundingRect!: {
+        left: number,
+        top: number,
+        right: number,
+        bottom: number
+    };
 
     constructor(
         _fisheyeCanvas: HTMLCanvasElement,
         _memeCanvas: HTMLCanvasElement,
-        _memeImg: HTMLImageElement,
+        _boundingRect: {
+            left: number,
+            top: number,
+            right: number,
+            bottom: number
+        },
         _sizeX: number | undefined,
         _sizeY: number | null = null
     ) {
@@ -28,11 +38,11 @@ export class Fisheye {
         if (typeof _sizeY === 'undefined') {
             this.sizeY = this.sizeX;
         }
-        this.memeImg = _memeImg;
+
         this.memeCanvas = _memeCanvas;
+        this.boundingRect = _boundingRect;
         this.fisheyeCanvas = _fisheyeCanvas;
         this.fisheyeCtx = _fisheyeCanvas.getContext('2d') as CanvasRenderingContext2DExtended;
-
         this.fisheyeCanvas.style.display = 'block';
         this.fisheyeCanvas.width = this.memeCanvas.width;
         this.fisheyeCanvas.height = this.memeCanvas.height;
@@ -42,8 +52,8 @@ export class Fisheye {
         this.listeners.mousemouse = this.moved.bind(this);
         this.listeners.touchmove = this.moved.bind(this);
         this.listeners.click = this.click.bind(this);
-        this.memeImg.addEventListener("mousemove", this.listeners.mousemouse);
-        this.memeImg.addEventListener("touchmove", this.listeners.touchmove);
+        window.addEventListener("mousemove", this.listeners.mousemouse);
+        window.addEventListener("touchmove", this.listeners.touchmove);
         window.addEventListener("click", this.listeners.click);
         this.fisheyeCanvas.style.position = 'absolute';
         this.fisheyeCanvas.width = this.sizeX;
@@ -51,8 +61,8 @@ export class Fisheye {
     }
 
     destructor(): void {
-        this.memeImg.removeEventListener("mousemove", this.listeners.mousemouse);
-        this.memeImg.removeEventListener("touchmove", this.listeners.touchmove);
+        window.removeEventListener("mousemove", this.listeners.mousemouse);
+        window.removeEventListener("touchmove", this.listeners.touchmove);
         window.removeEventListener("click", this.listeners.click);
         const ctx = this.memeCanvas.getContext('2d');
         ctx!.drawImage(
@@ -74,8 +84,8 @@ export class Fisheye {
         const cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
         const cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
 
-        const tx = cx - this.memeCanvas.offsetLeft - (.5 * this.sizeX);
-        const ty = cy - this.memeCanvas.offsetTop - (.5 * this.sizeY);
+        const tx = cx - this.boundingRect.left - (.5 * this.sizeX);
+        const ty = cy - this.boundingRect.top - (.5 * this.sizeY);
 
         this.fisheyeCanvas.style.left = tx + 'px';
         this.fisheyeCanvas.style.top = ty + 'px';

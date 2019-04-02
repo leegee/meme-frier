@@ -458,7 +458,7 @@ export class FriedMeme extends PolymerElement {
         this.iFisheye = new Fisheye(
             this.$.fisheye as HTMLCanvasElement,
             this.canvas,
-            this.img,
+            this.img.getBoundingClientRect(),
             200
         );
         this.iFisheye.run();
