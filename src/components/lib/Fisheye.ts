@@ -8,22 +8,30 @@ export class Fisheye {
     src = "https://lumiere-a.akamaihd.net/v1/images/r_thorragnarok_header_nowplaying_47d36193.jpeg?region=0,0,2048,680";
 
     memeCanvas!: HTMLCanvasElement;
+    memeImg: HTMLImageElement;
     fisheyeCanvas!: HTMLCanvasElement;
     fisheyeCtx!: CanvasRenderingContext2DExtended;
     listeners: { [key: string]: EventListenerOrEventListenerObject; } = {};
     sizeX = 200;
     sizeY = 200;
 
-    constructor(_fisheyeCanvas, _memeCanvas, _sizeX, _sizeY = null) {
+    constructor(
+        _fisheyeCanvas: HTMLCanvasElement,
+        _memeCanvas: HTMLCanvasElement,
+        _memeImg: HTMLImageElement,
+        _sizeX: number | undefined,
+        _sizeY: number | null = null
+    ) {
         if (typeof _sizeX !== 'undefined') {
             this.sizeX = _sizeX;
         }
-        if (typeof _sizeY !== 'undefined') {
+        if (typeof _sizeY === 'undefined') {
             this.sizeY = this.sizeX;
         }
+        this.memeImg = _memeImg;
         this.memeCanvas = _memeCanvas;
         this.fisheyeCanvas = _fisheyeCanvas;
-        this.fisheyeCtx = _fisheyeCanvas.getContext('2d');
+        this.fisheyeCtx = _fisheyeCanvas.getContext('2d') as CanvasRenderingContext2DExtended;
 
         this.fisheyeCanvas.style.display = 'block';
         this.fisheyeCanvas.width = this.memeCanvas.width;
@@ -31,21 +39,24 @@ export class Fisheye {
     }
 
     run(): void {
-        this.listeners.mousemouse = this.moved.bind(this); 
+        this.listeners.mousemouse = this.moved.bind(this);
         this.listeners.touchmove = this.moved.bind(this);
         this.listeners.click = this.click.bind(this);
-        window.addEventListener("mousemove", this.listeners.mousemouse);
-        window.addEventListener("touchmove", this.listeners.touchmove);
+        this.memeImg.addEventListener("mousemove", this.listeners.mousemouse);
+        this.memeImg.addEventListener("touchmove", this.listeners.touchmove);
         window.addEventListener("click", this.listeners.click);
+        this.fisheyeCanvas.style.position = 'absolute';
+        this.fisheyeCanvas.width = this.sizeX;
+        this.fisheyeCanvas.height = this.sizeY;
     }
 
     destructor(): void {
-        window.removeEventListener("mousemove", this.listeners.mousemouse);
-        window.removeEventListener("touchmove", this.listeners.touchmove);
+        this.memeImg.removeEventListener("mousemove", this.listeners.mousemouse);
+        this.memeImg.removeEventListener("touchmove", this.listeners.touchmove);
         window.removeEventListener("click", this.listeners.click);
         const ctx = this.memeCanvas.getContext('2d');
-        ctx!.drawImage( 
-            this.fisheyeCanvas, 
+        ctx!.drawImage(
+            this.fisheyeCanvas,
             parseInt(this.fisheyeCanvas.style.left || ''),
             parseInt(this.fisheyeCanvas.style.top || '')
         );
@@ -57,24 +68,24 @@ export class Fisheye {
         e.preventDefault();
     }
 
-    moved(e): void { // : MouseEvent | TouchEvent
+    moved(e): void {
         e.preventDefault();
 
-        const cx = (e.touches ? e.touches[0].clientX : e.clientX);
-        const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+        const cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
+        const cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
 
-        this.fisheyeCanvas.style.position = 'absolute';
-        this.fisheyeCanvas.width = this.sizeX;
-        this.fisheyeCanvas.height = this.sizeY;
-        this.fisheyeCanvas.style.left = cx - this.sizeX / 2 + 'px';
-        this.fisheyeCanvas.style.top = cy - this.sizeY / 2 + 'px';
+        const tx = cx - this.memeCanvas.offsetLeft - (.5 * this.sizeX);
+        const ty = cy - this.memeCanvas.offsetTop - (.5 * this.sizeY);
+
+        this.fisheyeCanvas.style.left = tx + 'px';
+        this.fisheyeCanvas.style.top = ty + 'px';
 
         this.fisheyeCtx.fillStyle = '#000';
         this.fisheyeCtx.fillRect(0, 0, this.sizeX, this.sizeY);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
-            cx - this.memeCanvas.offsetLeft - .5 * this.sizeX,
-            cy - this.memeCanvas.offsetTop - .5 * this.sizeY,
+            tx,
+            ty,
             this.sizeX,
             this.sizeY,
             0,

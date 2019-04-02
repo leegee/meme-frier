@@ -113,7 +113,7 @@ export class FriedMeme extends PolymerElement {
     }
 
     _propertiesUpdated(): void {
-        if (! this.working) {
+        if (!this.working) {
             console.log('Enter _propertiesUpdated');
             if (this.originalImg) {
                 console.log('Set srcimg to ', this.originalImg.src);
@@ -426,6 +426,7 @@ export class FriedMeme extends PolymerElement {
 
     /** Saves at display size, not original size */
     private saveImage(): void {
+        console.log('Enter save image');
         const url = URL.createObjectURL(this.lastBlob);
         const a = document.createElement('a');
         a.setAttribute('download', 'true');
@@ -454,7 +455,12 @@ export class FriedMeme extends PolymerElement {
     private fisheye(): void {
         console.info((this.$.srcimg as HTMLElement).offsetLeft);
         this.working = true;
-        this.iFisheye = new Fisheye(this.$.fisheye, this.canvas, 200);
+        this.iFisheye = new Fisheye(
+            this.$.fisheye as HTMLCanvasElement,
+            this.canvas,
+            this.img,
+            200
+        );
         this.iFisheye.run();
         this.fisheyeExitListener = this.applyFisheye.bind(this);
         window.addEventListener("dblclick", this.fisheyeExitListener);
