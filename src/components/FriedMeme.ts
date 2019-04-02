@@ -113,11 +113,13 @@ export class FriedMeme extends PolymerElement {
     }
 
     _propertiesUpdated(): void {
-        console.log('Enter _propertiesUpdated');
-        if (this.originalImg) {
-            console.log('Set srcimg to ', this.originalImg.src);
-            (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
-            this.connectedCallback();
+        if (! this.working) {
+            console.log('Enter _propertiesUpdated');
+            if (this.originalImg) {
+                console.log('Set srcimg to ', this.originalImg.src);
+                (this.$.srcimg as HTMLImageElement).src = this.originalImg.src;
+                this.connectedCallback();
+            }
         }
     }
 
@@ -159,7 +161,6 @@ export class FriedMeme extends PolymerElement {
 
         this.canvas = document.createElement('canvas');
 
-        // What size to opeate upon...?
         this.width = this.canvas.width = this.img.width;
         this.height = this.canvas.height = this.img.height;
 
@@ -452,6 +453,7 @@ export class FriedMeme extends PolymerElement {
 
     private fisheye(): void {
         console.info((this.$.srcimg as HTMLElement).offsetLeft);
+        this.working = true;
         this.iFisheye = new Fisheye(this.$.fisheye, this.canvas, 200);
         this.iFisheye.run();
         this.fisheyeExitListener = this.applyFisheye.bind(this);
@@ -463,6 +465,7 @@ export class FriedMeme extends PolymerElement {
         this.iFisheye.destructor();
         window.removeEventListener("dblclick", this.fisheyeExitListener);
         await this._losslessSave();
+        this.working = false;
     }
 
     newImage(src: string): void {
