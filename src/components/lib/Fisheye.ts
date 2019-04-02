@@ -13,8 +13,6 @@ export class Fisheye {
     listeners: { [key: string]: EventListenerOrEventListenerObject; } = {};
     sizeX = 200;
     sizeY = 200;
-    zoomX = 1;
-    zoomY = 1;
 
     constructor(_fisheyeCanvas, _memeCanvas, _sizeX, _sizeY = null) {
         if (typeof _sizeX !== 'undefined') {
@@ -75,10 +73,10 @@ export class Fisheye {
         this.fisheyeCtx.fillRect(0, 0, this.sizeX, this.sizeY);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
-            cx - this.memeCanvas.offsetLeft - .5 * this.sizeX / this.zoomX,
-            cy - this.memeCanvas.offsetTop - .5 * this.sizeY / this.zoomY,
-            this.sizeX / this.zoomX,
-            this.sizeY / this.zoomY,
+            cx - this.memeCanvas.offsetLeft - .5 * this.sizeX,
+            cy - this.memeCanvas.offsetTop - .5 * this.sizeY,
+            this.sizeX,
+            this.sizeY,
             0,
             0,
             this.sizeX,
