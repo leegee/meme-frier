@@ -75,7 +75,7 @@ export class MemeFrier extends PolymerElement {
 
         this.$.globalCompositeOperations.addEventListener("iron-select", (e: Event) => {
             this.globalCompositeOperation = (e as CustomEvent).detail.item.innerText;
-            if (! (this.$.drawer as unknown as AppDrawerElement).persistent) {
+            if (!(this.$.drawer as unknown as AppDrawerElement).persistent) {
                 (this.$.drawer as unknown as AppDrawerElement).close();
             }
         });
@@ -114,7 +114,8 @@ export class MemeFrier extends PolymerElement {
 
                 this.$.meme.addEventListener("drop", (e: Event) => {
                     e.preventDefault();
-                    if ((e as DragEvent).dataTransfer.items &&
+                    if ((e as DragEvent).dataTransfer &&
+                        (e as DragEvent).dataTransfer.items &&
                         (e as DragEvent).dataTransfer.items[0].kind === 'file'
                     ) {
                         const file = (e as DragEvent).dataTransfer.items[0].getAsFile();
