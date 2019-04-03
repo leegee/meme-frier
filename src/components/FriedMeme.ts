@@ -21,6 +21,7 @@ export class FriedMeme extends PolymerElement {
     protected working = false;
 
     private img!: HTMLImageElement;
+    private srcImgClass = 'portrait';
     private lastBlob!: Blob;
     private canvas!: HTMLCanvasElement;
     private ctx!: CanvasRenderingContext2DExtended;
@@ -95,6 +96,11 @@ export class FriedMeme extends PolymerElement {
 
     ready(): void {
         super.ready();
+
+        this.addEventListener("orientationchange", function () {
+            alert("the orientation of the device is now " + screen.orientation.angle);
+        });
+
         this.addEventListener('fisheye', () => {
             this.fisheye();
         });
@@ -139,6 +145,12 @@ export class FriedMeme extends PolymerElement {
         delete (this.$.srcimg as HTMLImageElement).height;
         delete (this.$.srcimg as HTMLElement).style.width;
         delete (this.$.srcimg as HTMLElement).style.height;
+
+        if ((this.$.srcimg as HTMLImageElement).width > (this.$.srcimg as HTMLImageElement).height) {
+            this.srcImgClass = 'landscape';
+        } else {
+            this.srcImgClass = 'portrait';
+        }
 
         this.img = this.$.srcimg as HTMLImageElement;
         this.img.onload = null;
@@ -453,7 +465,6 @@ export class FriedMeme extends PolymerElement {
     }
 
     private fisheye(): void {
-        console.info((this.$.srcimg as HTMLElement).offsetLeft);
         this.working = true;
         this.iFisheye = new Fisheye(
             this.$.fisheye as HTMLCanvasElement,
@@ -468,7 +479,7 @@ export class FriedMeme extends PolymerElement {
 
     private async applyFisheye(e: MouseEvent): Promise<void> {
         e.preventDefault();
-        this.iFisheye.destructor();
+        this.iFisheye.finalise();
         window.removeEventListener("dblclick", this.fisheyeExitListener);
         await this._losslessSave();
         this.working = false;

@@ -19,6 +19,10 @@ export class Fisheye {
         right: number,
         bottom: number
     };
+    tx!: number;
+    ty!: number;
+    cx!: number;
+    cy!: number;
 
     constructor(
         _fisheyeCanvas: HTMLCanvasElement,
@@ -55,21 +59,18 @@ export class Fisheye {
         window.addEventListener("mousemove", this.listeners.mousemouse);
         window.addEventListener("touchmove", this.listeners.touchmove);
         window.addEventListener("click", this.listeners.click);
-        this.fisheyeCanvas.style.position = 'absolute';
+        this.fisheyeCanvas.style.position = 'fixed';
+        this.fisheyeCanvas.style.zIndex = '10';
         this.fisheyeCanvas.width = this.sizeX;
         this.fisheyeCanvas.height = this.sizeY;
     }
 
-    destructor(): void {
+    finalise(): void {
         window.removeEventListener("mousemove", this.listeners.mousemouse);
         window.removeEventListener("touchmove", this.listeners.touchmove);
         window.removeEventListener("click", this.listeners.click);
         const ctx = this.memeCanvas.getContext('2d');
-        ctx!.drawImage(
-            this.fisheyeCanvas,
-            parseInt(this.fisheyeCanvas.style.left || ''),
-            parseInt(this.fisheyeCanvas.style.top || '')
-        );
+        ctx!.drawImage(this.fisheyeCanvas, this.tx, this.ty);
         this.fisheyeCanvas.style.display = 'none';
     }
 
@@ -78,24 +79,25 @@ export class Fisheye {
         e.preventDefault();
     }
 
+
     moved(e): void {
         e.preventDefault();
 
-        const cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
-        const cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
+        this.cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
+        this.cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
 
-        const tx = cx - this.boundingRect.left - (.5 * this.sizeX);
-        const ty = cy - this.boundingRect.top - (.5 * this.sizeY);
+        this.tx = this.cx - this.boundingRect.left - (.5 * this.sizeX);
+        this.ty = this.cy - this.boundingRect.top - (.5 * this.sizeY);
 
-        this.fisheyeCanvas.style.left = tx + 'px';
-        this.fisheyeCanvas.style.top = ty + 'px';
+        this.fisheyeCanvas.style.left = this.cx - (.5 * this.sizeX) + 'px';
+        this.fisheyeCanvas.style.top = this.cy - (.5 * this.sizeY) + 'px';
 
         this.fisheyeCtx.fillStyle = '#000';
         this.fisheyeCtx.fillRect(0, 0, this.sizeX, this.sizeY);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
-            tx,
-            ty,
+            this.tx,
+            this.ty,
             this.sizeX,
             this.sizeY,
             0,
@@ -120,7 +122,7 @@ export class Fisheye {
 
         for (var i = 0; i < result.length; i++) {
             index = 4 * i;
-            if (result[i] != undefined) {
+            if (result[i] !== undefined) {
                 pixels[index + 0] = result[i][0];
                 pixels[index + 1] = result[i][1];
                 pixels[index + 2] = result[i][2];
