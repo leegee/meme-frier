@@ -11,8 +11,7 @@ export class Fisheye {
     fisheyeCanvas!: HTMLCanvasElement;
     fisheyeCtx!: CanvasRenderingContext2DExtended;
     listeners: { [key: string]: EventListenerOrEventListenerObject; } = {};
-    sizeX = 200;
-    sizeY = 200;
+    size: number;
     boundingRect!: {
         left: number,
         top: number,
@@ -33,23 +32,14 @@ export class Fisheye {
             right: number,
             bottom: number
         },
-        _sizeX: number | undefined,
-        _sizeY: number | null = null
+        _size: number | undefined | null = null
     ) {
-        if (typeof _sizeX !== 'undefined') {
-            this.sizeX = _sizeX;
-        }
-        if (typeof _sizeY === 'undefined') {
-            this.sizeY = this.sizeX;
-        }
-
         this.memeCanvas = _memeCanvas;
         this.boundingRect = _boundingRect;
         this.fisheyeCanvas = _fisheyeCanvas;
         this.fisheyeCtx = _fisheyeCanvas.getContext('2d') as CanvasRenderingContext2DExtended;
         this.fisheyeCanvas.style.display = 'block';
-        this.fisheyeCanvas.width = this.memeCanvas.width;
-        this.fisheyeCanvas.height = this.memeCanvas.height;
+        this.size = _size || Math.floor((this.memeCanvas.width > this.memeCanvas.height ? this.memeCanvas.width : this.memeCanvas.height) / 3);
     }
 
     run(): void {
@@ -61,8 +51,8 @@ export class Fisheye {
         window.addEventListener("click", this.listeners.click);
         this.fisheyeCanvas.style.position = 'fixed';
         this.fisheyeCanvas.style.zIndex = '10';
-        this.fisheyeCanvas.width = this.sizeX;
-        this.fisheyeCanvas.height = this.sizeY;
+        this.fisheyeCanvas.width = this.size;
+        this.fisheyeCanvas.height = this.size;
     }
 
     finalise(): void {
@@ -86,30 +76,30 @@ export class Fisheye {
         this.cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
         this.cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
 
-        this.tx = this.cx - this.boundingRect.left - (.5 * this.sizeX);
-        this.ty = this.cy - this.boundingRect.top - (.5 * this.sizeY);
+        this.tx = this.cx - this.boundingRect.left - (.5 * this.size);
+        this.ty = this.cy - this.boundingRect.top - (.5 * this.size);
 
-        this.fisheyeCanvas.style.left = this.cx - (.5 * this.sizeX) + 'px';
-        this.fisheyeCanvas.style.top = this.cy - (.5 * this.sizeY) + 'px';
+        this.fisheyeCanvas.style.left = this.cx - (.5 * this.size) + 'px';
+        this.fisheyeCanvas.style.top = this.cy - (.5 * this.size) + 'px';
 
         this.fisheyeCtx.fillStyle = '#000';
-        this.fisheyeCtx.fillRect(0, 0, this.sizeX, this.sizeY);
+        this.fisheyeCtx.fillRect(0, 0, this.size, this.size);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
             this.tx,
             this.ty,
-            this.sizeX,
-            this.sizeY,
+            this.size,
+            this.size,
             0,
             0,
-            this.sizeX,
-            this.sizeY
+            this.size,
+            this.size
         );
 
-        const imgData = this.fisheyeCtx.getImageData(0, 0, this.sizeX, this.sizeY);
+        const imgData = this.fisheyeCtx.getImageData(0, 0, this.size, this.size);
         const pixels = imgData.data;
-        const h = this.sizeX;
-        const w = this.sizeY;
+        const h = this.size;
+        const w = this.size;
         let pixelsCopy: any = []; // Uint8ClampedArray
         let index = 0;
 
