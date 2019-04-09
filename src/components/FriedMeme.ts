@@ -15,7 +15,7 @@ import { getTemplate } from './lib/getTemplate';
 import * as view from './FriedMeme.template.html';
 
 export class FriedMeme extends PolymerElement {
-    public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '😭', '😆', '😢', '😭'];
+    public emojis = ['🤑', '😭', '😨', '😧', '😱', '😫', '😩', '😃', '😄', '🤡', '👌'];
 
     protected loaded = false;
     protected working = false;
