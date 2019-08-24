@@ -1,12 +1,7 @@
 import { CanvasRenderingContext2DExtended } from "./CanvasRenderingContext2DExtended.interface";
 
 export class Fisheye {
-
     bg = document.getElementById('bg');
-
-    //src = "https://i.kinja-img.com/gawker-media/image/upload/t_original/fwf4rfhsob5wnkwlrwzl.jpg";
-    src = "https://lumiere-a.akamaihd.net/v1/images/r_thorragnarok_header_nowplaying_47d36193.jpeg?region=0,0,2048,680";
-
     memeCanvas!: HTMLCanvasElement;
     fisheyeCanvas!: HTMLCanvasElement;
     fisheyeCtx!: CanvasRenderingContext2DExtended;
@@ -18,10 +13,8 @@ export class Fisheye {
         right: number,
         bottom: number
     };
-    tx!: number;
-    ty!: number;
-    cx!: number;
-    cy!: number;
+    topX!: number;
+    topY!: number;
 
     constructor(
         _fisheyeCanvas: HTMLCanvasElement,
@@ -55,39 +48,39 @@ export class Fisheye {
         this.fisheyeCanvas.height = this.size;
     }
 
-    finalise(): void {
+    finalise(renderIfTrue = true): void {
         window.removeEventListener("mousemove", this.listeners.mousemouse);
         window.removeEventListener("touchmove", this.listeners.touchmove);
         window.removeEventListener("click", this.listeners.click);
-        const ctx = this.memeCanvas.getContext('2d');
-        ctx!.drawImage(this.fisheyeCanvas, this.tx, this.ty);
+        if (renderIfTrue) {
+            const ctx = this.memeCanvas.getContext('2d');
+            ctx!.drawImage(this.fisheyeCanvas, this.topX, this.topY);
+        }
         this.fisheyeCanvas.style.display = 'none';
     }
-
 
     click(e): void {
         e.preventDefault();
     }
 
-
     moved(e): void {
         e.preventDefault();
 
-        this.cx = (e.touches ? e.touches[0].offsetX : e.offsetX);
-        this.cy = (e.touches ? e.touches[0].offsetY : e.offsetY);
+        const cursorX = (e.touches ? e.touches[0].offsetX : e.offsetX);
+        const cursorY = (e.touches ? e.touches[0].offsetY : e.offsetY);
 
-        this.tx = this.cx - this.boundingRect.left - (.5 * this.size);
-        this.ty = this.cy - this.boundingRect.top - (.5 * this.size);
+        this.fisheyeCanvas.style.left = cursorX - (.5 * this.size) + 'px';
+        this.fisheyeCanvas.style.top = cursorY - (.5 * this.size) + 'px';
 
-        this.fisheyeCanvas.style.left = this.cx - (.5 * this.size) + 'px';
-        this.fisheyeCanvas.style.top = this.cy - (.5 * this.size) + 'px';
+        this.topX = cursorX - this.boundingRect.left - (.5 * this.size);
+        this.topY = cursorY - this.boundingRect.top - (.5 * this.size);
 
         this.fisheyeCtx.fillStyle = '#000';
         this.fisheyeCtx.fillRect(0, 0, this.size, this.size);
         this.fisheyeCtx.drawImage(
             this.memeCanvas,
-            this.tx,
-            this.ty,
+            this.topX,
+            this.topY,
             this.size,
             this.size,
             0,

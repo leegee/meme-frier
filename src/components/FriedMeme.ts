@@ -29,8 +29,9 @@ export class FriedMeme extends PolymerElement {
     private width!: number;
     private height!: number;
     private jpegItteration!: number;
-    private iFisheye!: Fisheye;
-    private fisheyeExitListener!: any; // TODO
+    private fisheyeInstance!: Fisheye;
+    private fisheyeExitHandler!: any; // MouseEvent; 
+    private fisheyeKeyHandler!: any; // KeyboardEvent;
 
     private blurFilterId!: string;
     private convFilterId!: string;
@@ -102,7 +103,7 @@ export class FriedMeme extends PolymerElement {
         });
 
         this.addEventListener('fisheye', () => {
-            this.fisheye();
+            this.beginFisheye();
         });
 
         this.addEventListener('rotate45', () => {
@@ -464,25 +465,41 @@ export class FriedMeme extends PolymerElement {
         (this.$.srcimg as HTMLElement).style.transform = `rotate(${deg}deg)`;
     }
 
-    private fisheye(): void {
+    private beginFisheye(): void {
         this.working = true;
-        this.iFisheye = new Fisheye(
+        this.fisheyeInstance = new Fisheye(
             this.$.fisheye as HTMLCanvasElement,
             this.canvas,
             this.img.getBoundingClientRect(),
             300
         );
-        this.iFisheye.run();
-        this.fisheyeExitListener = this.applyFisheye.bind(this);
-        window.addEventListener("dblclick", this.fisheyeExitListener);
+        this.fisheyeInstance.run();
+        this.fisheyeExitHandler = this.applyFisheye.bind(this);
+        this.fisheyeKeyHandler = this.keysForFisheye.bind(this);
+        window.addEventListener("dblclick", this.fisheyeExitHandler);
+        window.addEventListener("keyup", this.fisheyeKeyHandler);
+    }
+
+    private fisheyeCleanup(){
+        window.removeEventListener("dblclick", this.fisheyeExitHandler);
+        window.removeEventListener("keyup", this.fisheyeKeyHandler);
+        this.working = false;
+        delete this.fisheyeInstance;
+    }
+
+    private async keysForFisheye(e: KeyboardEvent): Promise<void> {
+         if ( e.keyCode === 27) {
+            e.preventDefault();
+            this.fisheyeInstance.finalise(false);
+            this.fisheyeCleanup();
+         }
     }
 
     private async applyFisheye(e: MouseEvent): Promise<void> {
         e.preventDefault();
-        this.iFisheye.finalise();
-        window.removeEventListener("dblclick", this.fisheyeExitListener);
+        this.fisheyeInstance.finalise();
         await this._losslessSave();
-        this.working = false;
+        this.fisheyeCleanup();
     }
 
     newImage(src: string): void {
